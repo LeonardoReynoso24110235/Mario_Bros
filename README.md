@@ -1,2 +1,4 @@
 # Mario_Bros
-Intregantes
+Intregantes 
+Jeremy Gael Vazquez Jimenes
+Leonardo Reynoso Arana
