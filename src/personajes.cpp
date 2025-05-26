@@ -1,12 +1,17 @@
 #include <SFML/Graphics.hpp>
 #include "personajes.h"
+#include <iostream>
+
+using namespace std;
+
+int vidas = 3; // Inicializar vidas
 
 Personaje::Personaje(sf::Vector2f position, sf::Color color) {
     shape.setSize(sf::Vector2f(50, 50));
     shape.setPosition(position);
     shape.setFillColor(color);
     velocityY = 0;
-    isJumping = false;
+    isJumping = false;    
 }
 
 void Personaje::move(float offsetX) {
@@ -33,6 +38,22 @@ void Personaje::applyGravity(float gravity, float groundLevel) {
 
 void Personaje::draw(sf::RenderWindow& window) {
     window.draw(shape);
+}
+
+sf::FloatRect Personaje::getBounds() const {
+    return shape.getGlobalBounds();
+}
+
+bool Personaje::isJumpingOn(const sf::RectangleShape& enemigoShape) const {
+    return shape.getPosition().y + shape.getSize().y <= enemigoShape.getPosition().y;
+}
+
+void Personaje::perderVida() {
+    vidas--;
+    if (vidas <= 0) {
+        std::cout << "Game Over" << std::endl;
+        // Lógica adicional para terminar el juego
+    }
 }
 
 int main() {
