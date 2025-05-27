@@ -3,8 +3,17 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+sf::Texture menuTexture;
+sf::Sprite menuSprite;
+
 void mostrarMenu() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Super CETI Menu");
+
+    // Cargar textura de fondo del menú
+    if (!menuTexture.loadFromFile("assets/img/menu_fondo.png")) {
+        std::cerr << "Error al cargar la textura del fondo del menú.\n";
+    }
+    menuSprite.setTexture(menuTexture);
 
     sf::Font font;
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -57,7 +66,8 @@ void mostrarMenu() {
             }
         }
 
-        window.clear(sf::Color(0, 0, 128)); // Fondo azul estilo Mario
+        window.clear();
+        window.draw(menuSprite);
         window.draw(titulo);
         for (int i = 0; i < 2; ++i) {
             window.draw(opciones[i]);

@@ -1,46 +1,43 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <Box2D/Box2D.h>
 #include "enemigos.h"
 #include "personajes.h"
 
 // Implementación de las funciones relacionadas con los enemigos
 void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
-    if (direccion == 1) {
-        shape.move(4.0f, 0);
-        contadorMovimiento++;
-        if (contadorMovimiento >= 4) {
-            direccion = 2; // Cambia a saltar
-            contadorMovimiento = 0;
-        }
-    } else if (direccion == 2) {
-        shape.move(0, -3.0f);
-        contadorMovimiento++;
-        if (contadorMovimiento >= 3) {
-            direccion = 3; // Cambia a moverse a la izquierda
-            contadorMovimiento = 0;
-        }
-    } else if (direccion == 3) {
-        shape.move(-4.0f, 0);
-        contadorMovimiento++;
-        if (contadorMovimiento >= 4) {
-            direccion = 4; // Cambia a saltar
-            contadorMovimiento = 0;
-        }
-    } else if (direccion == 4) {
-        shape.move(0, 3.0f);
-        contadorMovimiento++;
-        if (contadorMovimiento >= 3) {
-            direccion = 1; // Vuelve a moverse a la derecha
-            contadorMovimiento = 0;
-        }
+    // Actualizar animación
+    if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f) {
+        frameActual = (frameActual + 1) % texturasMovimiento.size();
+        enemigoSprite.setTexture(texturasMovimiento[frameActual]);
+        relojAnimacion.restart();
     }
 
-    // Asegura que el enemigo no caiga por debajo del suelo
-    if (shape.getPosition().y + shape.getSize().y > groundLevel) {
-        shape.setPosition(shape.getPosition().x, groundLevel - shape.getSize().y);
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(enemigoSprite.getPosition().x, enemigoSprite.getPosition().y);
+    b2Body* body = mundoEnemigos.CreateBody(&bodyDef);
+
+    b2PolygonShape dynamicBox;
+    dynamicBox.SetAsBox(enemigoSprite.getGlobalBounds().width / 2.0f, enemigoSprite.getGlobalBounds().height / 2.0f);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+
+    mundoEnemigos.Step(1.0f / 60.0f, 6, 2);
+
+    enemigoSprite.setPosition(body->GetPosition().x, body->GetPosition().y);
+
+    if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
+        enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
-    window.draw(shape);
+    window.draw(enemigoSprite);
 }
 
 void Enemigo::interactuarConJugador(Personaje& personaje) {
@@ -60,8 +57,31 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     direccion = 1;
     contadorMovimiento = 0;
     eliminado = false;
+
+    // Cargar texturas para animaciones
+    for (int i = 1; i <= 4; ++i) {
+        sf::Texture textura;
+        if (!textura.loadFromFile("assets/img/enemigo_" + std::to_string(i) + ".png")) {
+            std::cerr << "Error al cargar la textura enemigo_" << i << ".png\n";
+        }
+        texturasMovimiento.push_back(textura);
+    }
+
+    enemigoSprite.setTexture(texturasMovimiento[0]);
+    enemigoSprite.setPosition(position);
+
+    // Inicializar sonido de salto del enemigo
+    if (!saltoEnemigoBuffer.loadFromFile("assets/sound/salto_enemigo.ogg")) {
+        std::cerr << "Error al cargar el sonido de salto del enemigo.\n";
+    }
+    saltoEnemigoSound.setBuffer(saltoEnemigoBuffer);
 }
 
 bool Enemigo::isEliminado() const {
     return eliminado;
+}
+
+void Enemigo::jump() {
+    saltoEnemigoSound.play();
+    // Lógica de salto del enemigo
 }

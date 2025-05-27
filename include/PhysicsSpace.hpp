@@ -1,3 +1,4 @@
+#include <chipmunk.h> // Incluir el encabezado de Chipmunk Physics
 
 class PhysicsSpace {
 public:
