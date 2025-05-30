@@ -31,10 +31,30 @@ Personaje::Personaje(sf::Vector2f position, sf::Color color) {
 
     personajeSprite.setTexture(texturasMovimientoPersonaje[0]);
     personajeSprite.setPosition(position);
+
+    // Cargar sonidos
+    if (!saltoBuffer.loadFromFile("assets/sonidos/salto.mp3")) {
+        std::cerr << "Error al cargar el sonido de salto.\n";
+    }
+    saltoSound.setBuffer(saltoBuffer);
+
+    if (!golpearBuffer.loadFromFile("assets/sonidos/golpear.mp3")) {
+        std::cerr << "Error al cargar el sonido de golpear.\n";
+    }
+    golpearSound.setBuffer(golpearBuffer);
+
+    if (!correrBuffer.loadFromFile("assets/sonidos/correr.mp3")) {
+        std::cerr << "Error al cargar el sonido de correr.\n";
+    }
+    correrSound.setBuffer(correrBuffer);
 }
 
 void Personaje::move(float offsetX) {
     personajeSprite.move(offsetX, 0);
+    // Reproducir sonido de correr
+    if (correrSound.getStatus() != sf::Sound::Status::Playing) {
+        correrSound.play();
+    }
     // Actualizar animación
     if (relojAnimacionPersonaje.getElapsedTime().asSeconds() > 0.2f) {
         frameActualPersonaje = (frameActualPersonaje + 1) % texturasMovimientoPersonaje.size();
@@ -83,20 +103,9 @@ void Personaje::perderVida() {
 }
 
 void Personaje::eliminarEnemigo() {
-    eliminarEnemigoSound.play();
+    golpearSound.play();
     // Lógica para eliminar enemigo
 }
-
-// Inicializar sonidos
-if (!saltoBuffer.loadFromFile("assets/sound/salto.ogg")) {
-    std::cerr << "Error al cargar el sonido de salto.\n";
-}
-saltoSound.setBuffer(saltoBuffer);
-
-if (!eliminarEnemigoBuffer.loadFromFile("assets/sound/eliminar_enemigo.ogg")) {
-    std::cerr << "Error al cargar el sonido de eliminación de enemigo.\n";
-}
-eliminarEnemigoSound.setBuffer(eliminarEnemigoBuffer);
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Mario Bros");

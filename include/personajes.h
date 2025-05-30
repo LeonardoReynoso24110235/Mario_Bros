@@ -2,6 +2,8 @@
 #define PERSONAJES_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp> // Incluir para el manejo de audio
+#include <vector> // Incluir para el uso de std::vector
 
 class Personaje {
 public:
@@ -21,6 +23,20 @@ private:
     bool isJumping;
     const float jumpStrength = 5.0f;
     int vidas = 3; // Número de vidas del personaje
+
+    // Sonidos y buffers
+    sf::SoundBuffer saltoBuffer;
+    sf::SoundBuffer golpearBuffer;
+    sf::SoundBuffer correrBuffer;
+    sf::Sound saltoSound;
+    sf::Sound golpearSound;
+    sf::Sound correrSound;
+
+    // Animación
+    std::vector<sf::Texture> texturasMovimientoPersonaje;
+    int frameActualPersonaje = 0;
+    sf::Sprite personajeSprite;
+    sf::Clock relojAnimacionPersonaje;
 };
 
 #endif // PERSONAJES_H
