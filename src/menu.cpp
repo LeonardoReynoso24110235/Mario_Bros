@@ -6,7 +6,7 @@
 sf::Texture menuTexture;
 sf::Sprite menuSprite;
 
-void mostrarMenu() {
+void mostrarMenu() { 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Super CETI Menu");
 
     // Cargar textura de fondo del menú
@@ -46,22 +46,12 @@ void mostrarMenu() {
             }
 
             if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Up) {
-                    opciones[seleccion].setFillColor(sf::Color::White);
-                    seleccion = (seleccion - 1 + 2) % 2;
-                    opciones[seleccion].setFillColor(sf::Color::Red);
-                } else if (event.key.code == sf::Keyboard::Down) {
-                    opciones[seleccion].setFillColor(sf::Color::White);
-                    seleccion = (seleccion + 1) % 2;
-                    opciones[seleccion].setFillColor(sf::Color::Red);
-                } else if (event.key.code == sf::Keyboard::Enter) {
-                    if (seleccion == 0) {
-                        std::cout << "Iniciando juego..." << std::endl;
-                        window.close();
-                    } else if (seleccion == 1) {
-                        std::cout << "Saliendo del juego..." << std::endl;
-                        window.close();
-                    }
+                if (event.key.code == sf::Keyboard::Enter) {
+                    std::cout << "Iniciando juego..." << std::endl;
+                    window.close();
+                } else if (event.key.code == sf::Keyboard::Escape) {
+                    std::cout << "Saliendo del juego..." << std::endl;
+                    window.close();
                 }
             }
         }
@@ -74,4 +64,9 @@ void mostrarMenu() {
         }
         window.display();
     }
+}
+
+int main(int argc, char** argv) {
+    mostrarMenu();
+    return 0;
 }

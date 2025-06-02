@@ -17,7 +17,7 @@ EXECUTABLE = $(BIN_DIR)/mario_bros
 
 # Flags de compilación
 CXXFLAGS = -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 # Agregar la biblioteca de Box2D
 CXXFLAGS += -I/usr/include/box2d

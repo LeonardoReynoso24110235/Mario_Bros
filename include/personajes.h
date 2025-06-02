@@ -16,6 +16,11 @@ public:
     sf::FloatRect getBounds() const; // Devuelve los límites del personaje
     bool isJumpingOn(const sf::RectangleShape& enemigoShape) const; // Verifica si está saltando sobre un enemigo
     void perderVida(); // Reduce las vidas del personaje
+    void eliminarEnemigo(sf::RectangleShape& enemigoShape); // Declarar la función para eliminar enemigos
+    void recogerMoneda(); // Función para acumular puntos al recoger monedas
+    int getPuntos() const; // Obtener los puntos acumulados
+    void mostrarHUD(sf::RenderWindow& window, sf::Clock& relojJuego); // Mostrar HUD con vidas, puntos y tiempo
+    bool verificarTiempo(sf::Clock& relojJuego); // Verificar si el tiempo límite se ha excedido
 
 private:
     sf::RectangleShape shape;
@@ -23,6 +28,7 @@ private:
     bool isJumping;
     const float jumpStrength = 5.0f;
     int vidas = 3; // Número de vidas del personaje
+    int puntos = 0; // Puntos acumulados por el personaje
 
     // Sonidos y buffers
     sf::SoundBuffer saltoBuffer;

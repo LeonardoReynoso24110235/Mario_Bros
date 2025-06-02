@@ -82,6 +82,9 @@ bool Enemigo::isEliminado() const {
 }
 
 void Enemigo::jump() {
-    saltoEnemigoSound.play();
-    // Lógica de salto del enemigo
+    if (relojSalto.getElapsedTime().asSeconds() >= 5.0f) {
+        saltoEnemigoSound.play();
+        enemigoSprite.move(0, -10); // Salta 10 píxeles hacia arriba
+        relojSalto.restart();
+    }
 }
