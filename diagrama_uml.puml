@@ -1,0 +1,47 @@
+@startuml
+class Personaje {
+    + caminar : void
+    + saltar : void
+    + recogerPuntos : void
+    + perderVida : void
+    + eliminarEnemigo : void    
+}
+
+class Enemigo {
+    + atacar : void
+    + recibirDaño : void
+    + eliminar : void
+    + saltar : void
+    + caminar : void
+}
+
+class Moneda {
+    - valor : int
+}
+
+class Escenario {
+   
+}
+
+class Plataforma {
+
+}
+
+Personaje "1" *-- "*" Enemigo
+Personaje "1" o-- "*" Moneda
+Personaje "1" o-- "1" Escenario
+Escenario "1" o-- "*" Plataforma
+Personaje "1" *-- saltar
+Enemigo "1" *-- saltar
+Personaje "1" *-- caminar
+Enemigo "1" *-- caminar
+Personaje "1" *-- recogerPuntos
+Personaje "1" *-- perderVida
+Personaje "1" *-- eliminarEnemigo
+Enemigo "1" *-- atacar
+Enemigo "1" *-- recibirDaño
+Enemigo "1" *-- eliminar
+Moneda "1" *-- "1" valor
+Moneda "1" *-- recogerPuntos
+
+@enduml
