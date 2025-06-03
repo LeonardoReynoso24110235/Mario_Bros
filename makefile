@@ -16,12 +16,10 @@ OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(BIN_DIR)/%.o)
 EXECUTABLE = $(BIN_DIR)/mario_bros
 
 # Flags de compilación
-CXXFLAGS = -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
-
-# Agregar la biblioteca de Box2D
-CXXFLAGS += -I/usr/include/box2d
-LDFLAGS += -lBox2D
+CXXFLAGS = -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra \
+  -IC:/msys64/ucrt64/include
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d \
+  -LC:/msys64/ucrt64/lib
 
 # Regla principal
 all: $(EXECUTABLE)

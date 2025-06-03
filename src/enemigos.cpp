@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <Box2D/Box2D.h>
+// #include <box2d/box2d.h> // Usar la versión moderna de Box2D
 #include "enemigos.h"
 #include "personajes.h"
 
@@ -14,25 +14,23 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         relojAnimacion.restart();
     }
 
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(enemigoSprite.getPosition().x, enemigoSprite.getPosition().y);
-    b2Body* body = mundoEnemigos.CreateBody(&bodyDef);
+    // --- Código de Box2D eliminado/comentado ---
+    // b2BodyDef bodyDef;
+    // bodyDef.type = b2_dynamicBody;
+    // bodyDef.position.Set(enemigoSprite.getPosition().x, enemigoSprite.getPosition().y);
+    // b2Body* body = mundoEnemigos.CreateBody(&bodyDef);
+    // b2PolygonShape dynamicBox;
+    // dynamicBox.SetAsBox(enemigoSprite.getGlobalBounds().width / 2.0f, enemigoSprite.getGlobalBounds().height / 2.0f);
+    // b2FixtureDef fixtureDef;
+    // fixtureDef.shape = &dynamicBox;
+    // fixtureDef.density = 1.0f;
+    // fixtureDef.friction = 0.3f;
+    // body->CreateFixture(&fixtureDef);
+    // mundoEnemigos.Step(1.0f / 60.0f, 6, 2);
+    // enemigoSprite.setPosition(body->GetPosition().x, body->GetPosition().y);
+    // ------------------------------------------
 
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(enemigoSprite.getGlobalBounds().width / 2.0f, enemigoSprite.getGlobalBounds().height / 2.0f);
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-
-    body->CreateFixture(&fixtureDef);
-
-    mundoEnemigos.Step(1.0f / 60.0f, 6, 2);
-
-    enemigoSprite.setPosition(body->GetPosition().x, body->GetPosition().y);
-
+    // Lógica de colisión con el suelo usando solo SFML
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
@@ -88,3 +86,21 @@ void Enemigo::jump() {
         relojSalto.restart();
     }
 }
+
+// Si quieres usar Box2D 3.x, debes usar la nueva API basada en IDs y componentes, que es mucho más compleja y diferente.
+// Por ejemplo, para crear un cuerpo en Box2D 3.x:
+//
+// #include <box2d/box2d.h>
+// b2WorldDef worldDef;
+// b2WorldId worldId = b2CreateWorld(&worldDef);
+// b2BodyDef bodyDef = b2DefaultBodyDef();
+// bodyDef.type = b2_dynamicBody;
+// bodyDef.position = {x, y};
+// b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+// b2Polygon box = b2MakeBox(halfWidth, halfHeight);
+// b2ShapeDef shapeDef = b2DefaultShapeDef();
+// b2CreatePolygonShape(worldId, bodyId, &shapeDef, &box);
+// ...
+//
+// Sin embargo, adaptar todo tu código a la nueva API requiere una reestructuración importante.
+//

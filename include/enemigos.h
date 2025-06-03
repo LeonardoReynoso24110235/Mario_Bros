@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "personajes.h"
-#include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 
 class Enemigo {
 public:
@@ -25,7 +25,7 @@ private:
     int frameActual = 0; // Frame actual de la animación
     sf::Clock relojAnimacion; // Reloj para controlar la animación
 
-    b2World mundoEnemigos = b2World(b2Vec2(0.0f, 10.0f)); // Mundo de Box2D para los enemigos
+    // b2World mundoEnemigos = b2World(b2Vec2(0.0f, 10.0f)); // Mundo de Box2D para los enemigos
 
     sf::SoundBuffer saltoEnemigoBuffer; // Buffer para el sonido de salto
     sf::Sound saltoEnemigoSound; // Sonido de salto del enemigo
