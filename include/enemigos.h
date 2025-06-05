@@ -4,11 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "personajes.h"
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 
 class Enemigo {
 public:
-    Enemigo(sf::Vector2f position, sf::Color color);
+    Enemigo(sf::Vector2f position);
     void mover(sf::RenderWindow& window, float groundLevel);
     void interactuarConJugador(Personaje& personaje);
     void jump(); // Declarar el método para que el enemigo salte
@@ -20,12 +20,14 @@ private:
     int contadorMovimiento;
     bool eliminado;
 
-    sf::Sprite enemigoSprite; // Sprite del enemigo
-    std::vector<sf::Texture> texturasMovimiento; // Texturas para la animación
-    int frameActual = 0; // Frame actual de la animación
-    sf::Clock relojAnimacion; // Reloj para controlar la animación
+    sf::Texture texturaEnemigo1;
+    sf::Texture texturaEnemigo2;
+    sf::Sprite enemigoSprite;
+    std::vector<sf::Texture> texturasMovimiento;
+    int frameActual;
+    sf::Clock relojAnimacion;
 
-    // b2World mundoEnemigos = b2World(b2Vec2(0.0f, 10.0f)); // Mundo de Box2D para los enemigos
+    b2World mundoEnemigos = b2World(b2Vec2(0.0f, 10.0f)); // Mundo de Box2D para los enemigos
 
     sf::SoundBuffer saltoEnemigoBuffer; // Buffer para el sonido de salto
     sf::Sound saltoEnemigoSound; // Sonido de salto del enemigo

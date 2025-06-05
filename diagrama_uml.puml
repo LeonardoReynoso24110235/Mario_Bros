@@ -27,6 +27,123 @@ class Plataforma {
 
 }
 
+class juego {
+    private:
+
+    public:
+        juegoMario();
+        ~juegoMario();
+}
+
+class personaje {
+    private:
+        int x;
+        int y;
+        int vida;
+        int puntos;
+
+    public:
+        personaje();
+        ~personaje();
+        void mover(int dx, int dy);
+        void saltar();
+        void disparar();
+}
+
+class enemigo {
+    private:
+        int x;
+        int y;
+        int vida;
+
+    public:
+        enemigo();
+        ~enemigo();
+        void mover(int dx, int dy);
+        void atacar();
+}
+
+class vidas {
+    private:
+        int cantidad;
+
+    public:
+        vidas();
+        ~vidas();
+        void agregarVida();
+        void quitarVida();
+}
+
+class monedas {
+    private:
+        int cantidad;
+
+    public:
+        monedas();
+        ~monedas();
+        void agregarMoneda();
+        void quitarMoneda();
+}
+
+class bloque {
+    private:
+        int x;
+        int y;
+        
+    public:
+        bloque();
+        ~bloque();
+        void golpear();
+}
+
+class bloqueEspecial {
+    private:
+        int x;
+        int y;
+
+    public:
+        bloqueEspecial();
+        ~bloqueEspecial();
+        void golpear();
+}
+
+class powerUp {
+    private:
+        int tipo;
+
+    public:
+        powerUp();
+        ~powerUp();
+        void aplicarEfecto();
+}
+
+class jefe {
+    private:
+        int x;
+        int y;
+        int vida;
+
+    public:
+        jefe();
+        ~jefe();
+        void atacar();
+        void recibirDanio(int danio);
+}
+
+class puntaje {
+    private:
+        int puntosTotales;
+
+    public:
+        puntaje();
+        ~puntaje();
+        void agregarPuntos(int puntos);
+        void mostrarPuntaje();
+}
+
+personaje "1" *-- "3" vidas
+personaje "1" *-- "*" monedas
+monedas "1" *-- "1" cantidad
 Personaje "1" *-- "*" Enemigo
 Personaje "1" o-- "*" Moneda
 Personaje "1" o-- "1" Escenario

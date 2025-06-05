@@ -14,6 +14,10 @@ std::vector<sf::Texture> texturasMovimientoPersonaje;
 int frameActualPersonaje = 0;
 sf::Clock relojAnimacionPersonaje;
 
+// Nuevas texturas para salto y muerte
+sf::Texture texturaSalto;
+sf::Texture texturaMuerte;
+
 Personaje::Personaje(sf::Vector2f position, sf::Color color) {
     shape.setSize(sf::Vector2f(50, 50));
     shape.setPosition(position);
@@ -21,13 +25,23 @@ Personaje::Personaje(sf::Vector2f position, sf::Color color) {
     velocityY = 0;
     isJumping = false;
 
-    // Cargar texturas para animaciones del personaje
+    // Cargar texturas para animaciones de movimiento
     for (int i = 1; i <= 4; ++i) {
         sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/personaje_" + std::to_string(i) + ".png")) {
-            std::cerr << "Error al cargar la textura personaje_" << i << ".png\n";
+        if (!textura.loadFromFile("assets/img/p_principal" + std::to_string(i) + ".png")) {
+            std::cerr << "Error al cargar la textura p_principal" << i << ".png\n";
         }
         texturasMovimientoPersonaje.push_back(textura);
+    }
+
+    // Cargar textura de salto
+    if (!texturaSalto.loadFromFile("assets/img/p_saltando.png")) {
+        std::cerr << "Error al cargar la textura de salto.\n";
+    }
+
+    // Cargar textura de muerte
+    if (!texturaMuerte.loadFromFile("assets/img/p_muriendo.png")) {
+        std::cerr << "Error al cargar la textura de muerte.\n";
     }
 
     personajeSprite.setTexture(texturasMovimientoPersonaje[0]);
@@ -67,8 +81,9 @@ void Personaje::move(float offsetX) {
 void Personaje::jump() {
     if (!isJumping) {
         saltoSound.play();
-        velocityY = -jumpStrength;
+        velocityY = -10; // Salto de 10 píxeles hacia arriba
         isJumping = true;
+        personajeSprite.setTexture(texturaSalto); // Cambia a la textura de salto
     }
 }
 
@@ -79,7 +94,10 @@ void Personaje::applyGravity(float gravity, float groundLevel) {
     if (personajeSprite.getPosition().y + personajeSprite.getGlobalBounds().height >= groundLevel) {
         personajeSprite.setPosition(personajeSprite.getPosition().x, groundLevel - personajeSprite.getGlobalBounds().height);
         velocityY = 0;
-        isJumping = false;
+        if (isJumping) {
+            isJumping = false;
+            personajeSprite.setTexture(texturasMovimientoPersonaje[frameActualPersonaje]); // Vuelve a la textura de movimiento
+        }
     }
 }
 
@@ -98,6 +116,7 @@ bool Personaje::isJumpingOn(const sf::RectangleShape& enemigoShape) const {
 void Personaje::perderVida() {
     vidas--;
     if (vidas <= 0) {
+        personajeSprite.setTexture(texturaMuerte); // Cambia a la textura de muerte
         std::cout << "Game Over" << std::endl;
         // Lógica adicional para terminar el juego
     }

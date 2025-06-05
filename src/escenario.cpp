@@ -1,75 +1,87 @@
 #include <iostream>
-#include "escenario.h"
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <Box2D/Box2D.h>
+#include "enemigos.h"
+#include "personajes.h"
 
-// Implementación de las funciones relacionadas con el escenario
-void Escenario::dibujarFondo(sf::RenderWindow& window) {
-    window.draw(escenarioSprite);
+// Implementación de las funciones relacionadas con los enemigos
+void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
+    // Actualizar animación
+    if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f) {
+        frameActual = (frameActual + 1) % texturasMovimiento.size();
+        enemigoSprite.setTexture(texturasMovimiento[frameActual]);
+        relojAnimacion.restart();
+    }
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(enemigoSprite.getPosition().x, enemigoSprite.getPosition().y);
+    b2Body* body = mundoEnemigos.CreateBody(&bodyDef);
+
+    b2PolygonShape dynamicBox;
+    dynamicBox.SetAsBox(enemigoSprite.getGlobalBounds().width / 2.0f, enemigoSprite.getGlobalBounds().height / 2.0f);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+
+    mundoEnemigos.Step(1.0f / 60.0f, 6, 2);
+
+    enemigoSprite.setPosition(body->GetPosition().x, body->GetPosition().y);
+
+    if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
+        enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
+    }
+
+    // Dibujar enemigo
+    window.draw(enemigoSprite);
 }
 
-void Escenario::dibujarSuelo(sf::RenderWindow& window) {
-    suelo.setSize(sf::Vector2f(window.getSize().x, 5));
-    suelo.setPosition(0, window.getSize().y - 5);
-    suelo.setFillColor(sf::Color::Green);
-    window.draw(suelo);
-}
-
-void Escenario::moverEscenario(float offsetX) {
-    escenarioSprite.move(offsetX, 0);
-    suelo.move(offsetX, 0);
-}
-
-void Escenario::dibujarPlataformas(sf::RenderWindow& window) {
-    plataformas.clear();
-    sf::RectangleShape plataforma;
-    plataforma.setSize(sf::Vector2f(100, 10));
-    plataforma.setPosition(50, suelo.getPosition().y - 8);
-    plataforma.setFillColor(sf::Color::Blue);
-    plataformas.push_back(plataforma);
-
-    for (const auto& plat : plataformas) {
-        window.draw(plat);
+void Enemigo::interactuarConJugador(Personaje& personaje) {
+    if (shape.getGlobalBounds().intersects(personaje.getBounds())) {
+        if (personaje.isJumpingOn(shape)) {
+            eliminado = true; // Elimina al enemigo
+        } else {
+            personaje.perderVida(); // Quita una vida al personaje
+        }
     }
 }
 
-void Escenario::colocarMonedas(sf::RenderWindow& window) {
-    if (relojMonedas.getElapsedTime().asSeconds() >= 10.0f && monedas.size() < 10) {
-        sf::CircleShape moneda(5);
-        moneda.setFillColor(sf::Color::Yellow);
-        moneda.setPosition(rand() % window.getSize().x, 0);
-        monedas.push_back(moneda);
-        relojMonedas.restart();
+Enemigo::Enemigo(sf::Vector2f position) {
+    // Cargar texturas para animación de movimiento
+    if (!texturaEnemigo1.loadFromFile("assets/Trabajo final/goomba.png")) {
+        std::cerr << "Error al cargar la textura enemigo.png\n";
+    }
+    if (!texturaEnemigo2.loadFromFile("assets/Trabajo final/goomba2.png")) {
+        std::cerr << "Error al cargar la textura enemigo2.png\n";
     }
 
-    for (auto& moneda : monedas) {
-        moneda.move(0, 2); // Las monedas caen hacia abajo
-        window.draw(moneda);
+    texturasMovimiento.push_back(texturaEnemigo1);
+    texturasMovimiento.push_back(texturaEnemigo2);
+
+    enemigoSprite.setTexture(texturasMovimiento[0]);
+    enemigoSprite.setPosition(position);
+    eliminado = false;
+
+    // Inicializar sonido de salto del enemigo
+    if (!saltoEnemigoBuffer.loadFromFile("assets/sound/salto.mp3")) {
+        std::cerr << "Error al cargar el sonido de salto del enemigo.\n";
     }
+    saltoEnemigoSound.setBuffer(saltoEnemigoBuffer);
 }
 
-sf::Music backgroundMusic;
-
-void iniciarMusicaEscenario() {
-    if (!backgroundMusic.openFromFile("assets/music/escenario.mp3")) {
-        std::cerr << "Error al cargar la música del escenario.\n";
-        return;
-    }
-    backgroundMusic.setLoop(true);
-    backgroundMusic.play();
+bool Enemigo::isEliminado() const {
+    return eliminado;
 }
 
-sf::Texture escenarioTexture;
-sf::Sprite escenarioSprite;
-
-void iniciarEscenario(sf::RenderWindow& window) {
-    // Cargar textura de fondo del escenario
-    if (!escenarioTexture.loadFromFile("assets/img/escenario_fondo.png")) {
-        std::cerr << "Error al cargar la textura del fondo del escenario.\n";
+void Enemigo::jump() {
+    if (relojSalto.getElapsedTime().asSeconds() >= 5.0f) {
+        saltoEnemigoSound.play();
+        enemigoSprite.move(0, -10); // Salta 10 píxeles hacia arriba
+        relojSalto.restart();
     }
-    escenarioSprite.setTexture(escenarioTexture);
-
-    window.clear();
-    window.draw(escenarioSprite);
-    window.display();
 }

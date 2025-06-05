@@ -11,13 +11,19 @@ public:
     void moverEscenario(float offsetX); // Mover el escenario junto con el personaje
     void dibujarPlataformas(sf::RenderWindow& window); // Dibujar plataformas flotantes
     void colocarMonedas(sf::RenderWindow& window); // Colocar monedas en el escenario
+    void agregarBloqueInteractivo(sf::RenderWindow& window); // Agregar bloque interactivo
 
 private:
     sf::RectangleShape suelo;
     sf::Sprite escenarioSprite;
-    std::vector<sf::RectangleShape> plataformas;
-    std::vector<sf::CircleShape> monedas;
+    std::vector<sf::Sprite> plataformas;
+    std::vector<sf::Sprite> monedas;
     sf::Clock relojMonedas;
+    sf::Texture fondoTexture;
+    sf::Sprite fondoSprite;
+    sf::Texture nubeTexture;
+    sf::Sprite nubeIzquierda;
+    sf::Sprite nubeDerecha;
 };
 
 #endif // ESCENARIO_H
