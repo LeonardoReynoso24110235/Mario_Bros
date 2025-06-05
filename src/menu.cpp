@@ -7,7 +7,7 @@ sf::Texture menuTexture;
 sf::Sprite menuSprite;
 
 void mostrarMenu() { 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Super CETI Menu");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Super CETI");
 
     // Cargar textura de fondo del menú
     if (!menuTexture.loadFromFile("assets/img/menu_fondo.png")) {
@@ -16,8 +16,8 @@ void mostrarMenu() {
     menuSprite.setTexture(menuTexture);
 
     sf::Font font;
-    if (!font.loadFromFile("assets/arial.ttf")) {
-        std::cerr << "No se pudo cargar la fuente.\n";
+    if (!font.loadFromFile("assets/text/pixely[1].ttf")) {
+        std::cerr << "No se pudo cargar la fuente letraPixel.ttf.\n";
         return;
     }
 
@@ -66,7 +66,7 @@ void mostrarMenu() {
     }
 }
 
-int main(int argc, char** argv) {
+int main() {
     mostrarMenu();
     return 0;
 }
