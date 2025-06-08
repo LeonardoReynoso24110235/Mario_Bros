@@ -33,7 +33,7 @@ public:
         bolaFuegoSprite.setTexture(bolaFuegoTexture);
 
         // Cargar textura de la bandera
-        if (!banderaTexture.loadFromFile("../assets/img_finales/bandera.png")) {
+        if (!banderaTexture.loadFromFile("../assets/img_finales/howl.png")) {
             std::cerr << "Error: No se pudo cargar el recurso 'bandera.png'" << std::endl;
             return;
         }

@@ -33,15 +33,12 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Agregar la regla `run` para ejecutar el programa
+# Ejecutar el programa directamente
 run: all
-	./$(EXECUTABLE)
-
-# Regla combinada para compilar y ejecutar
-make_run: all run
+	.\$(EXECUTABLE)"
 
 # Limpiar archivos generados
 clean:
 	rm -rf $(BIN_DIR)/*.o $(EXECUTABLE)
 
-.PHONY: all clean
+.PHONY: all clean run
