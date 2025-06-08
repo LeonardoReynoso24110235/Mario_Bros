@@ -6,14 +6,16 @@
 
 class Escenario {
 public:
-    void dibujarFondo(sf::RenderWindow& window); // Dibujar el fondo del escenario
-    void dibujarSuelo(sf::RenderWindow& window); // Dibujar el suelo
-    void moverEscenario(float offsetX); // Mover el escenario junto con el personaje
-    void dibujarPlataformas(sf::RenderWindow& window); // Dibujar plataformas flotantes
-    void colocarMonedas(sf::RenderWindow& window); // Colocar monedas en el escenario
-    void agregarBloqueInteractivo(sf::RenderWindow& window); // Agregar bloque interactivo
+    Escenario();
+    void dibujar(sf::RenderWindow& window);
+    void agregarPlataforma(float x, float y);
+    void generarMoneda(float x, float y);
+    void actualizarMonedas();
+    void incrementarPuntaje(int cantidad);
 
 private:
+    sf::Text puntajeText;
+    int puntaje;
     sf::RectangleShape suelo;
     sf::Sprite escenarioSprite;
     std::vector<sf::Sprite> plataformas;
@@ -24,6 +26,9 @@ private:
     sf::Texture nubeTexture;
     sf::Sprite nubeIzquierda;
     sf::Sprite nubeDerecha;
+    sf::Texture bloqueTexture;
+    sf::Texture monedaTexture;
+    sf::Font font;
 };
 
 #endif // ESCENARIO_H

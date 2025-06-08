@@ -21,6 +21,8 @@ public:
     int getPuntos() const; // Obtener los puntos acumulados
     void mostrarHUD(sf::RenderWindow& window, sf::Clock& relojJuego); // Mostrar HUD con vidas, puntos y tiempo
     bool verificarTiempo(sf::Clock& relojJuego); // Verificar si el tiempo límite se ha excedido
+    void tomarTitulo(); // Cambiar a estado grande
+    void tocarEnemigo(); // Regresar a estado normal
 
 private:
     sf::RectangleShape shape;
@@ -29,6 +31,7 @@ private:
     const float jumpStrength = 5.0f;
     int vidas = 3; // Número de vidas del personaje
     int puntos = 0; // Puntos acumulados por el personaje
+    bool isGrande = false; // Indica si el personaje está en estado grande
 
     // Sonidos y buffers
     sf::SoundBuffer saltoBuffer;

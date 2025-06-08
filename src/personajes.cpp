@@ -22,43 +22,42 @@ Personaje::Personaje(sf::Vector2f position, sf::Color color) {
     shape.setSize(sf::Vector2f(50, 50));
     shape.setPosition(position);
     shape.setFillColor(color);
-    velocityY = 0;
-    isJumping = false;
 
-    // Cargar texturas para animaciones de movimiento
+    // Cargar texturas para animaciones
     for (int i = 1; i <= 4; ++i) {
         sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/p_principal" + std::to_string(i) + ".png")) {
-            std::cerr << "Error al cargar la textura p_principal" << i << ".png\n";
+        if (!textura.loadFromFile("../assets/img_finales/p_principal 1." + std::to_string(i) + ".png")) {
+            std::cerr << "Error: No se pudo cargar el recurso 'p_principal 1." + std::to_string(i) + ".png'" << std::endl;
+            continue; // Continuar con las siguientes texturas
         }
         texturasMovimientoPersonaje.push_back(textura);
     }
 
     // Cargar textura de salto
-    if (!texturaSalto.loadFromFile("assets/img/p_saltando.png")) {
-        std::cerr << "Error al cargar la textura de salto.\n";
+    if (!texturaSalto.loadFromFile("../assets/img_finales/p_saltando.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'p_saltando.png'" << std::endl;
     }
 
     // Cargar textura de muerte
-    if (!texturaMuerte.loadFromFile("assets/img/p_muriendo.png")) {
-        std::cerr << "Error al cargar la textura de muerte.\n";
+    if (!texturaMuerte.loadFromFile("../assets/img_finales/p_muriendo.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'p_muriendo.png'" << std::endl;
     }
 
-    personajeSprite.setTexture(texturasMovimientoPersonaje[0]);
+    personajeSprite.setTexture(texturasMovimientoPersonaje.empty() ? sf::Texture() : texturasMovimientoPersonaje[0]);
     personajeSprite.setPosition(position);
 
     // Cargar sonidos
-    if (!saltoBuffer.loadFromFile("assets/sonidos/salto.mp3")) {
+    if (!saltoBuffer.loadFromFile("../assets/sound/salto.mp3")) {
         std::cerr << "Error al cargar el sonido de salto.\n";
     }
     saltoSound.setBuffer(saltoBuffer);
 
-    if (!golpearBuffer.loadFromFile("assets/sonidos/golpear.mp3")) {
+    if (!golpearBuffer.loadFromFile("../assets/sound/golpear.mp3")) {
         std::cerr << "Error al cargar el sonido de golpear.\n";
     }
     golpearSound.setBuffer(golpearBuffer);
 
-    if (!correrBuffer.loadFromFile("assets/sonidos/correr.mp3")) {
+    if (!correrBuffer.loadFromFile("../assets/sound/correr.mp3")) {
         std::cerr << "Error al cargar el sonido de correr.\n";
     }
     correrSound.setBuffer(correrBuffer);
@@ -71,7 +70,7 @@ void Personaje::move(float offsetX) {
         correrSound.play();
     }
     // Actualizar animación
-    if (relojAnimacionPersonaje.getElapsedTime().asSeconds() > 0.2f) {
+    if (relojAnimacionPersonaje.getElapsedTime().asSeconds() > 0.1f) { // Reducir tiempo para animación más fluida
         frameActualPersonaje = (frameActualPersonaje + 1) % texturasMovimientoPersonaje.size();
         personajeSprite.setTexture(texturasMovimientoPersonaje[frameActualPersonaje]);
         relojAnimacionPersonaje.restart();
@@ -140,7 +139,7 @@ int Personaje::getPuntos() const {
 
 void Personaje::mostrarHUD(sf::RenderWindow& window, sf::Clock& relojJuego) {
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/Minecraft.ttf")) {
+    if (!font.loadFromFile("../assets/text/letraPixel.ttf")) {
         std::cerr << "Error al cargar la fuente del HUD.\n";
         return;
     }
@@ -173,6 +172,38 @@ void Personaje::mostrarHUD(sf::RenderWindow& window, sf::Clock& relojJuego) {
 
 bool Personaje::verificarTiempo(sf::Clock& relojJuego) {
     return relojJuego.getElapsedTime().asSeconds() >= 120; // Verificar si han pasado 2 minutos
+}
+
+void Personaje::tomarTitulo() {
+    // Cambiar a estado grande
+    isGrande = true;
+    texturasMovimientoPersonaje.clear();
+
+    for (int i = 1; i <= 3; ++i) {
+        sf::Texture textura;
+        if (!textura.loadFromFile("../assets/img_finales/p_grande" + std::to_string(i) + ".png")) {
+            std::cerr << "Error al cargar la textura p_grande" << i << ".png\n";
+        }
+        texturasMovimientoPersonaje.push_back(textura);
+    }
+    personajeSprite.setTexture(texturasMovimientoPersonaje[0]);
+}
+
+void Personaje::tocarEnemigo() {
+    if (isGrande) {
+        // Regresar a estado normal
+        isGrande = false;
+        texturasMovimientoPersonaje.clear();
+
+        for (int i = 1; i <= 4; ++i) {
+            sf::Texture textura;
+            if (!textura.loadFromFile("../assets/img_finales/p_principal 1." + std::to_string(i) + ".png")) {
+                std::cerr << "Error al cargar la textura p_principal 1." << i << ".png\n";
+            }
+            texturasMovimientoPersonaje.push_back(textura);
+        }
+        personajeSprite.setTexture(texturasMovimientoPersonaje[0]);
+    }
 }
 
 /*

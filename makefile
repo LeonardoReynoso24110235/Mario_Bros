@@ -17,7 +17,7 @@ EXECUTABLE = $(BIN_DIR)/mario_bros
 
 # Flags de compilación
 CXXFLAGS = -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra \
-  -IC:/msys64/ucrt64/include
+  -IC:/msys64/ucrt64/include -IC:/msys64/ucrt64/include/SFML
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d \
   -LC:/msys64/ucrt64/lib
 

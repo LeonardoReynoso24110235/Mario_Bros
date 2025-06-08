@@ -59,8 +59,9 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     // Cargar texturas para animaciones
     for (int i = 1; i <= 4; ++i) {
         sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/enemigo_" + std::to_string(i) + ".png")) {
-            std::cerr << "Error al cargar la textura enemigo_" << i << ".png\n";
+        if (!textura.loadFromFile("../assets/img_finales/koopa" + std::to_string(i) + ".png")) {
+            std::cerr << "Error: No se pudo cargar el recurso 'enemigo_" + std::to_string(i) + ".png'" << std::endl;
+            return;
         }
         texturasMovimiento.push_back(textura);
     }
@@ -69,22 +70,19 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     enemigoSprite.setPosition(position);
 
     // Inicializar sonido de salto del enemigo
-    if (!saltoEnemigoBuffer.loadFromFile("assets/sound/salto_enemigo.ogg")) {
-        std::cerr << "Error al cargar el sonido de salto del enemigo.\n";
+    if (!saltoEnemigoBuffer.loadFromFile("../assets/sound/salto.mp3")) {
+        std::cerr << "Error al cargar el sonido de salto enemigo.\n";
     }
-    saltoEnemigoSound.setBuffer(saltoEnemigoBuffer);
-}
-
-bool Enemigo::isEliminado() const {
-    return eliminado;
-}
-
-void Enemigo::jump() {
-    if (relojSalto.getElapsedTime().asSeconds() >= 5.0f) {
-        saltoEnemigoSound.play();
-        enemigoSprite.move(0, -10); // Salta 10 píxeles hacia arriba
-        relojSalto.restart();
+    if (!texturaEnemigo1.loadFromFile("../assets/img_finales/goomba.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'goomba.png'" << std::endl;
+        return;
     }
+    if (!texturaEnemigo1.loadFromFile("../assets/img_finales/koopa.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'koopa.png'" << std::endl;
+        return;
+    }
+
+    enemigoSprite.setTexture(texturaEnemigo1);
 }
 
 // Si quieres usar Box2D 3.x, debes usar la nueva API basada en IDs y componentes, que es mucho más compleja y diferente.
