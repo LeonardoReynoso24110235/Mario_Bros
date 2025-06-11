@@ -28,7 +28,7 @@ void iniciarJuego(sf::RenderWindow& window) {
 
         window.clear();
         escenario.dibujar(window);
-        mario.draw(window);
+        mario.dibujar(window);  // Cambio aquí
         window.display();
         std::cout << "Dibujando escenario y personaje" << std::endl;
     }
@@ -107,9 +107,4 @@ void mostrarMenu() {
         }
         window.display();
     }
-}
-
-int main() {
-    mostrarMenu();
-    return 0;
 }

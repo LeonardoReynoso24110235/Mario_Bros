@@ -1,11 +1,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-// #include <box2d/box2d.h> // Usar la versión moderna de Box2D
 #include "enemigos.h"
 #include "personajes.h"
 
-// Implementación de las funciones relacionadas con los enemigos
 void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
     // Actualizar animación
     if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f) {
@@ -14,45 +12,23 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         relojAnimacion.restart();
     }
 
-    // --- Código de Box2D eliminado/comentado ---
-    // b2BodyDef bodyDef;
-    // bodyDef.type = b2_dynamicBody;
-    // bodyDef.position.Set(enemigoSprite.getPosition().x, enemigoSprite.getPosition().y);
-    // b2Body* body = mundoEnemigos.CreateBody(&bodyDef);
-    // b2PolygonShape dynamicBox;
-    // dynamicBox.SetAsBox(enemigoSprite.getGlobalBounds().width / 2.0f, enemigoSprite.getGlobalBounds().height / 2.0f);
-    // b2FixtureDef fixtureDef;
-    // fixtureDef.shape = &dynamicBox;
-    // fixtureDef.density = 1.0f;
-    // fixtureDef.friction = 0.3f;
-    // body->CreateFixture(&fixtureDef);
-    // mundoEnemigos.Step(1.0f / 60.0f, 6, 2);
-    // enemigoSprite.setPosition(body->GetPosition().x, body->GetPosition().y);
-    // ------------------------------------------
-
     // Lógica de colisión con el suelo usando solo SFML
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
-    window.draw(enemigoSprite);
-}
+    // Lógica para mover al enemigo (puedes agregar más lógica para dirección y velocidad)
+    enemigoSprite.move(direccion * 2.f, 0.f);  // 2.f es la velocidad de movimiento
 
-void Enemigo::interactuarConJugador(Personaje& personaje) {
-    if (shape.getGlobalBounds().intersects(personaje.getBounds())) {
-        if (personaje.isJumpingOn(shape)) {
-            eliminado = true; // Elimina al enemigo
-        } else {
-            personaje.perderVida(); // Quita una vida al personaje
-        }
-    }
+    // Dibujar el enemigo
+    window.draw(enemigoSprite);
 }
 
 Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     shape.setSize(sf::Vector2f(50, 50));
     shape.setPosition(position);
     shape.setFillColor(color);
-    direccion = 1;
+    direccion = 1;  // Inicia moviéndose a la derecha
     contadorMovimiento = 0;
     eliminado = false;
 
@@ -77,28 +53,37 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
         std::cerr << "Error: No se pudo cargar el recurso 'goomba.png'" << std::endl;
         return;
     }
-    if (!texturaEnemigo1.loadFromFile("../assets/img_finales/koopa.png")) {
+    if (!texturaEnemigo2.loadFromFile("../assets/img_finales/koopa.png")) { // Usar una textura diferente
         std::cerr << "Error: No se pudo cargar el recurso 'koopa.png'" << std::endl;
         return;
     }
 
-    enemigoSprite.setTexture(texturaEnemigo1);
+    enemigoSprite.setTexture(texturaEnemigo1);  // Asigna la textura inicial
 }
 
-// Si quieres usar Box2D 3.x, debes usar la nueva API basada en IDs y componentes, que es mucho más compleja y diferente.
-// Por ejemplo, para crear un cuerpo en Box2D 3.x:
-//
-// #include <box2d/box2d.h>
-// b2WorldDef worldDef;
-// b2WorldId worldId = b2CreateWorld(&worldDef);
-// b2BodyDef bodyDef = b2DefaultBodyDef();
-// bodyDef.type = b2_dynamicBody;
-// bodyDef.position = {x, y};
-// b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-// b2Polygon box = b2MakeBox(halfWidth, halfHeight);
-// b2ShapeDef shapeDef = b2DefaultShapeDef();
-// b2CreatePolygonShape(worldId, bodyId, &shapeDef, &box);
-// ...
-//
-// Sin embargo, adaptar todo tu código a la nueva API requiere una reestructuración importante.
-//
+Enemigo::Enemigo(sf::Vector2f position) : Enemigo(position, sf::Color::Green) {} // Constructor adicional
+
+void Enemigo::interactuarConJugador(Personaje& personaje) {
+    if (shape.getGlobalBounds().intersects(personaje.getBounds())) {
+        if (personaje.isJumpingOn(shape)) {
+            eliminado = true; // Elimina al enemigo
+        } else {
+            personaje.perderVida(); // Quita una vida al personaje
+        }
+    }
+}
+
+// Implementación del método verificarColisionConPersonaje
+void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
+    // Verificar si los límites del sprite del enemigo se intersectan con los del personaje
+    if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
+        // Si el personaje toca al enemigo y no está saltando sobre él, pierde una vida
+        personaje.perderVida();
+        std::cout << "Colisión con el enemigo. Se perdió una vida." << std::endl;
+    }
+}
+
+// Implementación del método dibujar
+void Enemigo::dibujar(sf::RenderWindow& window) {
+    window.draw(enemigoSprite);  // Dibuja el sprite del enemigo en la ventana
+}

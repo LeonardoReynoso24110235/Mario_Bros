@@ -7,27 +7,31 @@
 
 class Enemigo {
 public:
-    Enemigo(sf::Vector2f position, sf::Color color);
-    void mover(sf::RenderWindow& window, float groundLevel);
-    void interactuarConJugador(Personaje& personaje);
-    void jump();
-    void cargarImagenAleatoria();
-    bool isEliminado() const;
+    Enemigo(sf::Vector2f position, sf::Color color); // Constructor con posición y color
+    Enemigo(sf::Vector2f position); // Constructor adicional para solo la posición
+
+    void mover(sf::RenderWindow& window, float groundLevel);  // Método para mover al enemigo
+    void interactuarConJugador(Personaje& personaje);  // Método para interactuar con el jugador
+    void jump();  // Método para saltar (si es necesario)
+    void cargarImagenAleatoria();  // Método para cargar una imagen aleatoria
+    bool isEliminado() const;  // Método para verificar si el enemigo ha sido eliminado
+    void verificarColisionConPersonaje(Personaje& personaje); // Verifica la colisión con el personaje
+    void dibujar(sf::RenderWindow& window);  // Método para dibujar al enemigo en la ventana
 
 private:
-    sf::RectangleShape shape;
-    sf::Sprite enemigoSprite;
-    sf::Texture texturaEnemigo1;
-    sf::Texture texturaEnemigo2;
-    std::vector<sf::Texture> texturasMovimiento;
-    sf::Clock relojAnimacion;
-    sf::Clock relojSalto;
-    sf::SoundBuffer saltoEnemigoBuffer;
-    sf::Sound saltoEnemigoSound;
-    int frameActual = 0;
-    bool eliminado = false;
-    int direccion;
-    int contadorMovimiento;
+    sf::RectangleShape shape;  // Forma de la colisión del enemigo
+    sf::Sprite enemigoSprite;  // Sprite que representa visualmente al enemigo
+    sf::Texture texturaEnemigo1;  // Textura del enemigo
+    sf::Texture texturaEnemigo2;  // Otra textura del enemigo (si es necesario)
+    std::vector<sf::Texture> texturasMovimiento;  // Lista de texturas para la animación del movimiento
+    sf::Clock relojAnimacion;  // Reloj para animación
+    sf::Clock relojSalto;  // Reloj para el salto
+    sf::SoundBuffer saltoEnemigoBuffer;  // Buffer para el sonido del salto
+    sf::Sound saltoEnemigoSound;  // Sonido del salto
+    int frameActual = 0;  // Frame actual para la animación
+    bool eliminado = false;  // Estado de eliminación del enemigo
+    int direccion;  // Dirección en la que se mueve el enemigo
+    int contadorMovimiento;  // Contador para las animaciones de movimiento
 };
 
 #endif // ENEMIGOS_H
