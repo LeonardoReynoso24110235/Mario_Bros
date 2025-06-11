@@ -2,26 +2,45 @@
 #define PERSONAJES_H
 
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <SFML/Audio.hpp>
 
 class Personaje {
+private:
+    std::vector<sf::Texture> texturasPequeno;
+    std::vector<sf::Texture> texturasGrande;
+    sf::Vector2f posicionInicial;
+    sf::Sprite sprite;
+    int frameActual = 0;
+    bool esGrande = false;
+    sf::Clock relojAnimacion;
+    int vidas;
+    bool saltando = false;  // Flag para saber si el personaje está saltando
+    bool enReposo = true;   // Flag para saber si el personaje está en reposo
+    float velocidadSalto = 0;  // Velocidad de salto
+    const float gravedad = 0.5f;  // Fuerza de la gravedad
+    const float alturaSalto = -10.0f;  // Velocidad inicial del salto (negativo para ir hacia arriba)    
+    sf::Texture texturaMuerte;
+    sf::SoundBuffer bufferMuerte;
+    sf::Sound sonidoMuerte;
+
+
 public:
-    Personaje(sf::Vector2f position, sf::Color color); // Constructor original
-    Personaje(sf::Vector2f position); // Constructor adicional para solo la posición
+    Personaje(sf::Vector2f position);
+    Personaje(sf::Vector2f position, sf::Color color);
 
     void moverIzquierda();
     void moverDerecha();
     void saltar();
-    int getVidas() const;
-    void perderVida();
+    void transformarEnGrande();
+    void actualizarGravedad();
+    void actualizarAnimacion();
     void dibujar(sf::RenderWindow& window);
 
-    bool isJumpingOn(sf::RectangleShape& enemy); // Método para verificar si el personaje está saltando sobre el enemigo
-    sf::FloatRect getBounds() const; // Método para obtener las dimensiones del personaje
-
-private:
-    sf::RectangleShape personajeShape;
-    sf::Sprite personajeSprite;
-    int vidas;
+    int getVidas() const;
+    void perderVida();
+    bool isJumpingOn(sf::RectangleShape& enemy);
+    sf::FloatRect getBounds() const;
 };
 
-#endif // PERSONAJES_H
+#endif

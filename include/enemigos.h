@@ -7,8 +7,9 @@
 
 class Enemigo {
 public:
-    Enemigo(sf::Vector2f position, sf::Color color); // Constructor con posición y color
-    Enemigo(sf::Vector2f position); // Constructor adicional para solo la posición
+    Enemigo(sf::Vector2f position); 
+    Enemigo(sf::Vector2f position, sf::Color color);
+    Enemigo(sf::Vector2f position, sf::Color color, float groundLevel); 
 
     void mover(sf::RenderWindow& window, float groundLevel);  // Método para mover al enemigo
     void interactuarConJugador(Personaje& personaje);  // Método para interactuar con el jugador

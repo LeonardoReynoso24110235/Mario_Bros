@@ -13,7 +13,7 @@ int main() {
 
     // Instanciar objetos del escenario y personajes
     Escenario escenario;
-    Personaje personaje(sf::Vector2f(100, 500));  // Ubicación inicial del personaje
+    Personaje personaje(sf::Vector2f(100, 400));  // Ubicación inicial del personaje
 
     // Inicializar el reloj de tiempo para 2 minutos
     sf::Clock relojJuego;
@@ -27,7 +27,7 @@ int main() {
 
     // Sonido de fondo
     sf::Music musicaFondo;
-    if (!musicaFondo.openFromFile("../assets/sound/soundtrack.mp3")) {
+    if (!musicaFondo.openFromFile("assets/img/sound/soundtrack.ogg")) {
         std::cerr << "Error al cargar la musica de fondo" << std::endl;
         return -1;
     }
@@ -36,7 +36,7 @@ int main() {
 
     // Música 2: soundtrack_2.ogg (no la reproducimos aún)
     sf::Music musicaJefe;
-    if (!musicaJefe.openFromFile("../assets/sound/soundtrack_2.ogg")) {
+    if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) {
         std::cerr << "Error al cargar soundtrack_2.ogg" << std::endl;
         return -1;
     }
@@ -58,8 +58,9 @@ int main() {
 
         // Generar enemigos cada 2 segundos hasta que se acabe el tiempo o el jugador gane
         if (tiempoTranscurrido < 120) {  // Solo mientras el tiempo no haya terminado
-            if (static_cast<int>(tiempoTranscurrido) % 2 == 0 && enemigos.size() < 10) {
-                enemigos.push_back(Enemigo(sf::Vector2f(300 + rand() % 200, 500)));  // Generar enemigo en posiciones aleatorias
+            if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= 20.0f && enemigos.size() < 10) {
+                enemigos.push_back(Enemigo(sf::Vector2f(300 + rand() % 200, 500)));  // Posición aleatoria
+                relojGenerarEnemigo.restart();  // Reiniciar reloj para esperar otros 20 segundos
             }
         }
 
@@ -83,9 +84,13 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             personaje.moverDerecha();
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            personaje.saltar();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            personaje.saltar();  // Hacer que el personaje salte al presionar la barra espaciadora
         }
+
+        // Actualizar la gravedad y animación del personaje
+        personaje.actualizarGravedad();  // Actualizar la gravedad en cada ciclo de juego
+        personaje.actualizarAnimacion();  // Actualizar animación si es necesario
 
         // Actualizar lógica del escenario, monedas y enemigos
         escenario.actualizarMonedas();

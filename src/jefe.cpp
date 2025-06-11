@@ -3,7 +3,7 @@
 // Constructor
 Jefe::Jefe(sf::Vector2f position) {
     // Cargar textura del jefe
-    if (!jefeTexture.loadFromFile("../assets/img_finales/nube.png")) {
+    if (!jefeTexture.loadFromFile("assets/img/img_finales/jefe.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'jefe.png'" << std::endl;
         return;
     }
@@ -11,27 +11,27 @@ Jefe::Jefe(sf::Vector2f position) {
     jefeSprite.setPosition(position);
 
     // Cargar textura de la bola de fuego
-    if (!bolaFuegoTexture.loadFromFile("../assets/img_finales/bola_fuego.png")) {
+    if (!bolaFuegoTexture.loadFromFile("assets/img/img_finales/bola_fuego.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'bola_fuego.png'" << std::endl;
         return;
     }
     bolaFuegoSprite.setTexture(bolaFuegoTexture);
 
     // Cargar sonido de bola de fuego
-    if (!bufferBolaFuego.loadFromFile("../assets/sound/bola_fuego.mp3")) {
+    if (!bufferBolaFuego.loadFromFile("assets/img/sound/bola_fuego.mp3")) {
         std::cerr << "Error: No se pudo cargar 'bola_fuego.ogg'\n";
     }
     sonidoBolaFuego.setBuffer(bufferBolaFuego);
 
     // Cargar sonido de salto del jefe
-    if (!bufferSalto.loadFromFile("../assets/sound/salto_jefe.mp3")) {
+    if (!bufferSalto.loadFromFile("assets/img/sound/salto_jefe.mp3")) {
         std::cerr << "Error: No se pudo cargar 'salto_jefe.ogg'\n";
     }
     sonidoSalto.setBuffer(bufferSalto);
 
 
     // Cargar textura de la bandera
-    if (!banderaTexture.loadFromFile("../assets/img_finales/howl.png")) {
+    if (!banderaTexture.loadFromFile("assets/img/img_finales/howl.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'bandera.png'" << std::endl;
         return;
     }
@@ -87,13 +87,13 @@ void Jefe::mostrarMensajeFinal(sf::RenderWindow& window) {
     sf::Sprite mensajeSprite;
 
     // Cargar textura del mensaje
-    if (!mensajeTexture.loadFromFile("../assets/img_finales/bandera.png")) {
+    if (!mensajeTexture.loadFromFile("assets/img/img_finales/bandera.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'bandera.png'" << std::endl;
         return;
     }
 
     // Cargar sonido de victoria
-    if (!bufferVictoria.loadFromFile("../assets/sound/victoria.ogg")) {
+    if (!bufferVictoria.loadFromFile("assets/img/sound/victoria.ogg")) {
         std::cerr << "Error: No se pudo cargar 'victoria.ogg'\n";
     }
     sonidoVictoria.setBuffer(bufferVictoria);
@@ -103,7 +103,7 @@ void Jefe::mostrarMensajeFinal(sf::RenderWindow& window) {
                               window.getSize().y / 2 - mensajeSprite.getGlobalBounds().height / 2);
 
     sf::Font font;
-    if (!font.loadFromFile("../assets/text/letraPixel.ttf")) {
+    if (!font.loadFromFile("assets/img/text/letraPixel.ttf")) {
         std::cerr << "Error al cargar letraPixel.ttf\n";
         return;
     }

@@ -12,6 +12,8 @@ public:
     void generarMoneda(float x, float y);
     void actualizarMonedas();
     void incrementarPuntaje(int cantidad);
+    void actualizarTiempo(float deltaTime);  // Declaración de la función
+    void actualizarVida(int cambio);        // Declaración de la función
 
 private:
     sf::Text puntajeText;
@@ -29,6 +31,10 @@ private:
     sf::Texture bloqueTexture;
     sf::Texture monedaTexture;
     sf::Font font;
+
+    // Agregar las variables de vida y tiempo
+    int vida;               // Variable para las vidas del jugador
+    float tiempoRestante;   // Variable para el tiempo restante
 };
 
 #endif // ESCENARIO_H

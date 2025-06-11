@@ -45,7 +45,7 @@ void mostrarMenu() {
     std::cout << "Ruta actual de ejecución: " << std::filesystem::current_path() << std::endl;
 
     // Verificar carga de textura del fondo
-    if (!menuTexture.loadFromFile("assets/img_finales/retro.png")) {
+    if (!menuTexture.loadFromFile("assets/img/img_finales/fondo.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'assets/img_finales/retro.png'" << std::endl;
         return;
     }
@@ -54,7 +54,7 @@ void mostrarMenu() {
 
     // Verificar carga de fuente
     sf::Font font;
-    if (!font.loadFromFile("assets/text/pixely[1].ttf")) {
+    if (!font.loadFromFile("assets/img/text/pixely[1].ttf")) {
         std::cerr << "Error al cargar pixely[1].ttf" << std::endl;
         return;
     }
@@ -91,7 +91,7 @@ void mostrarMenu() {
                 if (event.key.code == sf::Keyboard::Enter) {
                     std::cout << "Iniciando el juego..." << std::endl;
                     iniciarJuego(window); // Iniciar el juego
-                    std::cout << "Regresando al menú..." << std::endl;
+                    std::cout << "Regresando al menu..." << std::endl;
                 } else if (event.key.code == sf::Keyboard::Escape) {
                     std::cout << "Saliendo del juego..." << std::endl;
                     window.close();

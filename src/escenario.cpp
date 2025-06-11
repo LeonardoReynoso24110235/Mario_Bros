@@ -6,39 +6,28 @@
 #include "escenario.h"
 #include <vector>
 
-// Las funciones de Enemigo están implementadas en enemigos.cpp, no aquí.
-
-// Comentado para evitar múltiples definiciones de `main`
-/*
-int main() {
-    // Tu código para el juego aquí
-
-    return 0;
-}
-*/
-
 Escenario::Escenario() {
     // Cargar fondo
-    if (!fondoTexture.loadFromFile("../assets/img_finales/retro.png")) {
+    if (!fondoTexture.loadFromFile("assets/img/img_finales/fondo.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'imagen.png'" << std::endl;
         return;
     }
     fondoSprite.setTexture(fondoTexture);
 
     // Cargar textura de bloque
-    if (!bloqueTexture.loadFromFile("../assets/img_finales/bloque.png")) {
+    if (!bloqueTexture.loadFromFile("assets/img/img_finales/bloque.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'bloque.png'" << std::endl;
         return;
     }
 
     // Cargar textura de moneda
-    if (!monedaTexture.loadFromFile("assets/img_finales/moneda.png")) {
+    if (!monedaTexture.loadFromFile("assets/img/img_finales/moneda.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'moneda.png'" << std::endl;
         return;
     }
 
     // Cargar fuente para el puntaje
-    if (!font.loadFromFile("../assets/text/pixely[1].ttf")) {
+    if (!font.loadFromFile("assets/img/text/pixely[1].ttf")) {
         std::cerr << "Error al cargar pixely[1].ttf\n";
     }
     puntajeText.setFont(font);

@@ -17,25 +17,27 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
-    // Lógica para mover al enemigo (puedes agregar más lógica para dirección y velocidad)
-    enemigoSprite.move(direccion * 2.f, 0.f);  // 2.f es la velocidad de movimiento
+    // Lógica para mover al enemigo hacia la izquierda (con una velocidad de 0.5f)
+    enemigoSprite.move(direccion * 0.5f, 0.f);  // Ajustado a velocidad 0.5f y dirección negativa para ir a la izquierda
 
     // Dibujar el enemigo
     window.draw(enemigoSprite);
 }
 
-Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
+Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
     shape.setSize(sf::Vector2f(50, 50));
     shape.setPosition(position);
     shape.setFillColor(color);
-    direccion = 1;  // Inicia moviéndose a la derecha
+    direccion = -1;
     contadorMovimiento = 0;
     eliminado = false;
 
+    enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
+
     // Cargar texturas para animaciones
-    for (int i = 1; i <= 4; ++i) {
+    for (int i = 1; i <= 2; ++i) {
         sf::Texture textura;
-        if (!textura.loadFromFile("../assets/img_finales/koopa" + std::to_string(i) + ".png")) {
+        if (!textura.loadFromFile("assets/img/img_finales/goomba" + std::to_string(i) + ".png")) {
             std::cerr << "Error: No se pudo cargar el recurso 'enemigo_" + std::to_string(i) + ".png'" << std::endl;
             return;
         }
@@ -43,17 +45,18 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     }
 
     enemigoSprite.setTexture(texturasMovimiento[0]);
-    enemigoSprite.setPosition(position);
 
     // Inicializar sonido de salto del enemigo
-    if (!saltoEnemigoBuffer.loadFromFile("../assets/sound/salto.mp3")) {
+    if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
         std::cerr << "Error al cargar el sonido de salto enemigo.\n";
     }
-    if (!texturaEnemigo1.loadFromFile("../assets/img_finales/goomba.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'goomba.png'" << std::endl;
+
+    // Cargar texturas alternativas
+    if (!texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'goomba1.png'" << std::endl;
         return;
     }
-    if (!texturaEnemigo2.loadFromFile("../assets/img_finales/koopa.png")) { // Usar una textura diferente
+    if (!texturaEnemigo2.loadFromFile("assets/img/img_finales/koopa.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'koopa.png'" << std::endl;
         return;
     }
@@ -61,7 +64,15 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color) {
     enemigoSprite.setTexture(texturaEnemigo1);  // Asigna la textura inicial
 }
 
-Enemigo::Enemigo(sf::Vector2f position) : Enemigo(position, sf::Color::Green) {} // Constructor adicional
+// Constructor que faltaba: recibe posición y color
+Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
+    : Enemigo(position, color, 400.f) // Puedes ajustar el valor de groundLevel según tu juego
+{}
+
+// Constructor para solo posición, usa color verde por defecto
+Enemigo::Enemigo(sf::Vector2f position)
+    : Enemigo(position, sf::Color::Green)
+{}
 
 void Enemigo::interactuarConJugador(Personaje& personaje) {
     if (shape.getGlobalBounds().intersects(personaje.getBounds())) {
@@ -73,17 +84,13 @@ void Enemigo::interactuarConJugador(Personaje& personaje) {
     }
 }
 
-// Implementación del método verificarColisionConPersonaje
 void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
-    // Verificar si los límites del sprite del enemigo se intersectan con los del personaje
     if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
-        // Si el personaje toca al enemigo y no está saltando sobre él, pierde una vida
         personaje.perderVida();
-        std::cout << "Colisión con el enemigo. Se perdió una vida." << std::endl;
+        std::cout << "Colision con el enemigo. Se perdio una vida." << std::endl;
     }
 }
 
-// Implementación del método dibujar
 void Enemigo::dibujar(sf::RenderWindow& window) {
-    window.draw(enemigoSprite);  // Dibuja el sprite del enemigo en la ventana
+    window.draw(enemigoSprite);
 }
