@@ -27,12 +27,20 @@ int main() {
 
     // Sonido de fondo
     sf::Music musicaFondo;
-    if (!musicaFondo.openFromFile("../assets/audio/fondo.ogg")) {
-        std::cerr << "Error al cargar la música de fondo" << std::endl;
+    if (!musicaFondo.openFromFile("../assets/sound/soundtrack.mp3")) {
+        std::cerr << "Error al cargar la musica de fondo" << std::endl;
         return -1;
     }
     musicaFondo.setLoop(true);
     musicaFondo.play();
+
+    // Música 2: soundtrack_2.ogg (no la reproducimos aún)
+    sf::Music musicaJefe;
+    if (!musicaJefe.openFromFile("../assets/sound/soundtrack_2.ogg")) {
+        std::cerr << "Error al cargar soundtrack_2.ogg" << std::endl;
+        return -1;
+    }
+    musicaJefe.setLoop(true);
 
     // Definir el nivel del suelo
     float groundLevel = 500.0f; // Puedes ajustar esta altura según el diseño de tu juego
@@ -55,9 +63,17 @@ int main() {
             }
         }
 
-        // Mostrar jefe después de 1:30 minutos
-        if (!jefeAparecido && tiempoTranscurrido >= 90) {
-            jefeAparecido = true;  // El jefe aparece después de 1:30
+        // Cambiar música al jefe solo si el jugador sigue vivo
+        if (tiempoTranscurrido >= 120.0f && personaje.getVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
+            musicaFondo.stop();
+            musicaJefe.play();
+        }
+
+        // Mostrar jefe después de 2 minutos
+        if (!jefeAparecido && tiempoTranscurrido >= 120) {
+            jefeAparecido = true;  // El jefe aparece después de 2:00
+            musicaFondo.stop();       // Detener la música anterior
+            musicaJefe.play();        // Iniciar la música del jefe
         }
 
         // Manejo de entradas del teclado para mover al personaje

@@ -3,7 +3,7 @@
 // Constructor
 Jefe::Jefe(sf::Vector2f position) {
     // Cargar textura del jefe
-    if (!jefeTexture.loadFromFile("../assets/img_finales/jefe.png")) {
+    if (!jefeTexture.loadFromFile("../assets/img_finales/nube.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'jefe.png'" << std::endl;
         return;
     }
@@ -16,6 +16,19 @@ Jefe::Jefe(sf::Vector2f position) {
         return;
     }
     bolaFuegoSprite.setTexture(bolaFuegoTexture);
+
+    // Cargar sonido de bola de fuego
+    if (!bufferBolaFuego.loadFromFile("../assets/sound/bola_fuego.mp3")) {
+        std::cerr << "Error: No se pudo cargar 'bola_fuego.ogg'\n";
+    }
+    sonidoBolaFuego.setBuffer(bufferBolaFuego);
+
+    // Cargar sonido de salto del jefe
+    if (!bufferSalto.loadFromFile("../assets/sound/salto_jefe.mp3")) {
+        std::cerr << "Error: No se pudo cargar 'salto_jefe.ogg'\n";
+    }
+    sonidoSalto.setBuffer(bufferSalto);
+
 
     // Cargar textura de la bandera
     if (!banderaTexture.loadFromFile("../assets/img_finales/howl.png")) {
@@ -74,10 +87,17 @@ void Jefe::mostrarMensajeFinal(sf::RenderWindow& window) {
     sf::Sprite mensajeSprite;
 
     // Cargar textura del mensaje
-    if (!mensajeTexture.loadFromFile("../assets/img_finales/mensaje.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'mensaje.png'" << std::endl;
+    if (!mensajeTexture.loadFromFile("../assets/img_finales/bandera.png")) {
+        std::cerr << "Error: No se pudo cargar el recurso 'bandera.png'" << std::endl;
         return;
     }
+
+    // Cargar sonido de victoria
+    if (!bufferVictoria.loadFromFile("../assets/sound/victoria.ogg")) {
+        std::cerr << "Error: No se pudo cargar 'victoria.ogg'\n";
+    }
+    sonidoVictoria.setBuffer(bufferVictoria);
+
     mensajeSprite.setTexture(mensajeTexture);
     mensajeSprite.setPosition(window.getSize().x / 2 - mensajeSprite.getGlobalBounds().width / 2,
                               window.getSize().y / 2 - mensajeSprite.getGlobalBounds().height / 2);

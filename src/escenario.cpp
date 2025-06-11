@@ -19,7 +19,7 @@ int main() {
 
 Escenario::Escenario() {
     // Cargar fondo
-    if (!fondoTexture.loadFromFile("../assets/img_finales/fondo.png")) {
+    if (!fondoTexture.loadFromFile("../assets/img_finales/retro.png")) {
         std::cerr << "Error: No se pudo cargar el recurso 'imagen.png'" << std::endl;
         return;
     }

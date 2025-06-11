@@ -17,6 +17,12 @@ private:
     sf::Clock relojMovimiento;
     sf::Clock relojBolaFuego;
     sf::Clock relojSalto;
+    sf::SoundBuffer bufferBolaFuego;
+    sf::SoundBuffer bufferSalto;
+    sf::Sound sonidoBolaFuego;
+    sf::Sound sonidoSalto;
+    sf::SoundBuffer bufferVictoria;
+    sf::Sound sonidoVictoria;
     bool moviendoAdelante = true;
 
 public:

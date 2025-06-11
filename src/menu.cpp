@@ -60,7 +60,7 @@ void mostrarMenu() {
     }
     std::cout << "Fuente cargada correctamente" << std::endl;
 
-    sf::Text titulo("Super Mario Bros", font, 50);
+    sf::Text titulo("Super CETI Bros", font, 50);
     titulo.setPosition(200, 80);
     titulo.setFillColor(sf::Color::Yellow);
 
