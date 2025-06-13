@@ -2,50 +2,40 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 #include "personajes.h"
 #include "enemigos.h"
 #include "jefe.h"
 #include "escenario.h"
 
 int main() {
-    // Crear la ventana del juego
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Cetianos Bros");
+    sf::RenderWindow window(sf::VideoMode(1200, 675), "Cetianos Bros");
 
-    // Instanciar objetos del escenario y personajes
     Escenario escenario;
-    Personaje personaje(sf::Vector2f(100, 400));  // Ubicación inicial del personaje
+    Personaje personaje(sf::Vector2f(100, 550));
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    // Inicializar el reloj de tiempo para 2 minutos
     sf::Clock relojJuego;
+    sf::Clock relojGenerarEnemigo;
+    sf::Clock relojGenerarMoneda;
     bool jefeAparecido = false;
 
-    // Vector de enemigos
     std::vector<Enemigo> enemigos;
+    Jefe jefe(sf::Vector2f(1000, 550));
 
-    // Instanciar jefe (pero no lo mostramos hasta el minuto 1:30)
-    Jefe jefe(sf::Vector2f(600, 400));  // Posición inicial del jefe
-
-    // Sonido de fondo
     sf::Music musicaFondo;
-    if (!musicaFondo.openFromFile("assets/img/sound/soundtrack.ogg")) {
-        std::cerr << "Error al cargar la musica de fondo" << std::endl;
-        return -1;
-    }
+    if (!musicaFondo.openFromFile("assets/img/sound/soundtrack.ogg")) return -1;
     musicaFondo.setLoop(true);
     musicaFondo.play();
 
-    // Música 2: soundtrack_2.ogg (no la reproducimos aún)
     sf::Music musicaJefe;
-    if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) {
-        std::cerr << "Error al cargar soundtrack_2.ogg" << std::endl;
-        return -1;
-    }
+    if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) return -1;
     musicaJefe.setLoop(true);
 
-    // Definir el nivel del suelo
-    float groundLevel = 500.0f; // Puedes ajustar esta altura según el diseño de tu juego
+    float groundLevel = 800.0f;
+    float tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
 
-    // Bucle principal del juego
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -53,53 +43,58 @@ int main() {
                 window.close();
         }
 
-        // Obtener el tiempo transcurrido
         float tiempoTranscurrido = relojJuego.getElapsedTime().asSeconds();
+        
+        if (relojGenerarMoneda.getElapsedTime().asSeconds() >= 5.0f) {
+            float xAleatorio = static_cast<float>(100 + std::rand() % 1000); // posición X aleatoria
+            escenario.generarMoneda(xAleatorio, 0); // aparece arriba y cae
+            relojGenerarMoneda.restart();
+        }
 
-        // Generar enemigos cada 2 segundos hasta que se acabe el tiempo o el jugador gane
-        if (tiempoTranscurrido < 120) {  // Solo mientras el tiempo no haya terminado
-            if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= 20.0f && enemigos.size() < 10) {
-                enemigos.push_back(Enemigo(sf::Vector2f(300 + rand() % 200, 500)));  // Posición aleatoria
-                relojGenerarEnemigo.restart();  // Reiniciar reloj para esperar otros 20 segundos
+        // Generar enemigos si no ha aparecido el jefe
+        if (tiempoTranscurrido < 30) {
+            if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= tiempoParaSiguienteEnemigo && enemigos.size() < 10) {
+                enemigos.emplace_back(sf::Vector2f(300 + std::rand() % 700, groundLevel));
+                relojGenerarEnemigo.restart();
+                tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
             }
         }
 
-        // Cambiar música al jefe solo si el jugador sigue vivo
-        if (tiempoTranscurrido >= 120.0f && personaje.getVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
+        // Cambiar música al aparecer el jefe
+        if (tiempoTranscurrido >= 30.0f && personaje.getVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
             musicaFondo.stop();
             musicaJefe.play();
         }
 
-        // Mostrar jefe después de 2 minutos
-        if (!jefeAparecido && tiempoTranscurrido >= 120) {
-            jefeAparecido = true;  // El jefe aparece después de 2:00
-            musicaFondo.stop();       // Detener la música anterior
-            musicaJefe.play();        // Iniciar la música del jefe
+        if (!jefeAparecido && tiempoTranscurrido >= 30) {
+            jefeAparecido = true;
+            musicaFondo.stop();
+            musicaJefe.play();
         }
 
-        // Manejo de entradas del teclado para mover al personaje
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            personaje.moverIzquierda();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            personaje.moverDerecha();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            personaje.saltar();  // Hacer que el personaje salte al presionar la barra espaciadora
-        }
+        // Controles
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.moverIzquierda();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.moverDerecha();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.saltar();
 
-        // Actualizar la gravedad y animación del personaje
-        personaje.actualizarGravedad();  // Actualizar la gravedad en cada ciclo de juego
-        personaje.actualizarAnimacion();  // Actualizar animación si es necesario
+        personaje.actualizarGravedad();
+        personaje.actualizarAnimacion();
 
-        // Actualizar lógica del escenario, monedas y enemigos
         escenario.actualizarMonedas();
+
+        // Actualizar enemigos
         for (auto& enemigo : enemigos) {
-            enemigo.mover(window, groundLevel); // Corregir la llamada, pasando los dos parámetros
-            enemigo.verificarColisionConPersonaje(personaje);
+            enemigo.mover(window, groundLevel);
+            enemigo.interactuarConJugador(personaje);
         }
 
-        // Verificar si el jefe debe aparecer
+        enemigos.erase(
+            std::remove_if(enemigos.begin(), enemigos.end(),
+                           [](const Enemigo& e) { return !e.estaActivo(); }),
+            enemigos.end()
+        );
+
+        // Jefe
         if (jefeAparecido) {
             jefe.mover();
             jefe.saltar();
@@ -107,37 +102,40 @@ int main() {
             jefe.verificarColisionConPersonaje(personaje);
         }
 
-        // Verificar si el personaje toca la bandera (final del nivel)
         if (jefeAparecido && jefe.verificarColisionConBandera(personaje)) {
             jefe.mostrarMensajeFinal(window);
-            break;  // Fin del juego, salir del bucle
+            break;
         }
 
-        // Verificar si el jugador ha perdido
-        if (personaje.getVidas() <= 0) {
-            std::cout << "¡Juego terminado! Has perdido." << std::endl;
-            break;  // Fin del juego, salir del bucle
+        // Verificar fin del juego
+        if (personaje.getVidas() <= 0 || tiempoTranscurrido >= 60) {
+            std::cout << "¡Juego terminado!" << std::endl;
+
+            // Mostrar mensaje y verificar si el jugador quiere reiniciar o salir
+            bool esperandoRespuesta = true;
+            while (esperandoRespuesta) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+                    personaje.restablecer();
+                    enemigos.clear();
+                    jefeAparecido = false;
+                    relojJuego.restart();
+                    relojGenerarEnemigo.restart();
+                    break;
+                }
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                    window.close();
+                    break;
+                }
+            }
         }
 
-        // Verificar si el tiempo se ha agotado
-        if (tiempoTranscurrido >= 120) {
-            std::cout << "¡Tiempo agotado! Has perdido." << std::endl;
-            break;  // Fin del juego, salir del bucle
-        }
-
-        // Dibujar todos los elementos
+        // Dibujar todo
         window.clear();
         escenario.dibujar(window);
         personaje.dibujar(window);
-
-        for (auto& enemigo : enemigos) {
-            enemigo.dibujar(window);
-        }
-
-        if (jefeAparecido) {
-            jefe.draw(window);
-        }
-
+        for (auto& enemigo : enemigos) enemigo.dibujar(window);
+        if (jefeAparecido) jefe.draw(window);
         window.display();
     }
 

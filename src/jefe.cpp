@@ -1,4 +1,5 @@
 #include "jefe.h"
+#include "personajes.h"
 
 // Constructor
 Jefe::Jefe(sf::Vector2f position) {

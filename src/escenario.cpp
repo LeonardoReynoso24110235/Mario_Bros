@@ -1,66 +1,53 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include "enemigos.h"
-#include "personajes.h"
 #include "escenario.h"
-#include <vector>
+#include <iostream>
 
 Escenario::Escenario() {
-    // Cargar fondo
-    if (!fondoTexture.loadFromFile("assets/img/img_finales/fondo.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'imagen.png'" << std::endl;
+    if (!fondoTexture.loadFromFile("assets/img/img_finales/fondo_final.jpg")) {
+        std::cerr << "Error: No se pudo cargar fondo_final.jpg" << std::endl;
         return;
     }
     fondoSprite.setTexture(fondoTexture);
 
-    // Cargar textura de bloque
     if (!bloqueTexture.loadFromFile("assets/img/img_finales/bloque.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'bloque.png'" << std::endl;
+        std::cerr << "Error: No se pudo cargar bloque.png" << std::endl;
         return;
     }
 
-    // Cargar textura de moneda
     if (!monedaTexture.loadFromFile("assets/img/img_finales/moneda.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'moneda.png'" << std::endl;
+        std::cerr << "Error: No se pudo cargar moneda.png" << std::endl;
         return;
     }
 
-    // Cargar fuente para el puntaje
     if (!font.loadFromFile("assets/img/text/pixely[1].ttf")) {
-        std::cerr << "Error al cargar pixely[1].ttf\n";
+        std::cerr << "Error al cargar pixely[1].ttf" << std::endl;
     }
     puntajeText.setFont(font);
     puntajeText.setCharacterSize(24);
     puntajeText.setFillColor(sf::Color::White);
     puntajeText.setPosition(10, 10);
     puntaje = 0;
+
+    float x = (1200 - (6 * 50)) / 2;
+    agregarPlataforma(x, 450);
 }
 
 void Escenario::dibujar(sf::RenderWindow& window) {
-    // Dibujar el fondo
     window.draw(fondoSprite);
-
-    // Dibujar las plataformas
-    for (const auto& plataforma : plataformas) {
+    for (const auto& plataforma : plataformas)
         window.draw(plataforma);
-    }
-
-    // Dibujar las monedas
-    for (const auto& moneda : monedas) {
+    for (const auto& moneda : monedas)
         window.draw(moneda);
-    }
-
-    // Dibujar el puntaje
     puntajeText.setString("Puntaje: " + std::to_string(puntaje));
     window.draw(puntajeText);
 }
 
 void Escenario::agregarPlataforma(float x, float y) {
-    sf::Sprite plataforma;
-    plataforma.setTexture(bloqueTexture);
-    plataforma.setPosition(x, y);
-    plataformas.push_back(plataforma);
+    for (int i = 0; i < 6; ++i) {
+        sf::Sprite plataforma;
+        plataforma.setTexture(bloqueTexture);
+        plataforma.setPosition(x + i * 30, y);
+        plataformas.push_back(plataforma);
+    }
 }
 
 void Escenario::generarMoneda(float x, float y) {
@@ -70,10 +57,30 @@ void Escenario::generarMoneda(float x, float y) {
     monedas.push_back(moneda);
 }
 
-void Escenario::actualizarMonedas() {
-    for (auto& moneda : monedas) {
-        moneda.move(0, 5); // Mover monedas hacia abajo
-    }
+void Escenario::actualizarMonedas(const sf::FloatRect& boundsPersonaje) {
+    const float limiteInferior = 575.0f;
+    monedas.erase(
+        std::remove_if(monedas.begin(), monedas.end(),
+            [&](sf::Sprite& moneda) {
+                moneda.move(0, 5);
+                bool tocandoPlataforma = false;
+                for (const auto& plataforma : plataformas) {
+                    if (moneda.getGlobalBounds().intersects(plataforma.getGlobalBounds())) {
+                        moneda.setPosition(moneda.getPosition().x, plataforma.getPosition().y - moneda.getGlobalBounds().height);
+                        tocandoPlataforma = true;
+                        break;
+                    }
+                }
+                if (!tocandoPlataforma && moneda.getPosition().y >= limiteInferior) {
+                    moneda.setPosition(moneda.getPosition().x, limiteInferior - moneda.getGlobalBounds().height);
+                }
+                if (moneda.getGlobalBounds().intersects(boundsPersonaje)) {
+                    incrementarPuntaje(1);
+                    return true;
+                }
+                return false;
+            }),
+        monedas.end());
 }
 
 void Escenario::incrementarPuntaje(int cantidad) {

@@ -4,7 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
-#include "personajes.h"
+
+// Declaración anticipada de la clase Personaje
+class Personaje;
 
 class Jefe {
 private:

@@ -28,7 +28,7 @@ $(TARGET): $(OBJ_FILES)
 
 # Ejecutar el programa principal
 run: $(TARGET)
-	./$<
+	./$(BIN_DIR)/main.exe
 
 # Limpiar los archivos generados
 clean:

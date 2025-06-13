@@ -1,96 +1,96 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include "enemigos.h"
 #include "personajes.h"
+#include <iostream>
+
+Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
+    direccion = -1;
+    estaEliminado = false;
+    frameActual = 0;
+
+    // Cargar texturas para animación
+    for (int i = 1; i <= 2; ++i) {
+        sf::Texture textura;
+        if (!textura.loadFromFile("assets/img/img_finales/goomba" + std::to_string(i) + ".png")) {
+            std::cerr << "Error cargando goomba" << i << ".png" << std::endl;
+            continue;
+        }
+        texturasMovimiento.push_back(textura);
+    }
+
+    // Establecer textura inicial si se cargó correctamente
+    if (!texturasMovimiento.empty()) {
+        enemigoSprite.setTexture(texturasMovimiento[0]);
+    }
+
+    // Posición del enemigo
+    enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
+
+    // Cargar sonido de salto del enemigo
+    if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
+        std::cerr << "Error al cargar sonido de salto enemigo.\n";
+    } else {
+        sonidoSalto.setBuffer(saltoEnemigoBuffer);
+    }
+
+    // Cargar texturas extra (aunque actualmente no se usan)
+    texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png");
+    texturaEnemigo2.loadFromFile("assets/img/img_finales/koopa.png");
+}
+
+Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
+    : Enemigo(position, color, 550.f) {}
+
+Enemigo::Enemigo(sf::Vector2f position)
+    : Enemigo(position, sf::Color::Green) {}
 
 void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
-    // Actualizar animación
-    if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f) {
+    if (estaEliminado) return;
+
+    // Animación
+    if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f && !texturasMovimiento.empty()) {
         frameActual = (frameActual + 1) % texturasMovimiento.size();
         enemigoSprite.setTexture(texturasMovimiento[frameActual]);
         relojAnimacion.restart();
     }
 
-    // Lógica de colisión con el suelo usando solo SFML
+    // Mantener al enemigo en el suelo
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
-    // Lógica para mover al enemigo hacia la izquierda (con una velocidad de 0.5f)
-    enemigoSprite.move(direccion * 0.5f, 0.f);  // Ajustado a velocidad 0.5f y dirección negativa para ir a la izquierda
+    // Movimiento lateral
+    enemigoSprite.move(direccion * 0.2f, 0.f);
 
-    // Dibujar el enemigo
+    // Rebotar en los bordes de la ventana
+    if (enemigoSprite.getPosition().x <= 0 || enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
+        direccion = -direccion;
+    }
+
     window.draw(enemigoSprite);
 }
 
-Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
-    shape.setSize(sf::Vector2f(50, 50));
-    shape.setPosition(position);
-    shape.setFillColor(color);
-    direccion = -1;
-    contadorMovimiento = 0;
-    eliminado = false;
+void Enemigo::interactuarConJugador(Personaje& personaje) {
+    if (estaEliminado) return;
 
-    enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
-
-    // Cargar texturas para animaciones
-    for (int i = 1; i <= 2; ++i) {
-        sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/img_finales/goomba" + std::to_string(i) + ".png")) {
-            std::cerr << "Error: No se pudo cargar el recurso 'enemigo_" + std::to_string(i) + ".png'" << std::endl;
-            return;
+    if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
+        if (personaje.isJumpingOn(*this)) {
+            this->eliminar();
+        } else {
+            personaje.perderVida();
         }
-        texturasMovimiento.push_back(textura);
     }
-
-    enemigoSprite.setTexture(texturasMovimiento[0]);
-
-    // Inicializar sonido de salto del enemigo
-    if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
-        std::cerr << "Error al cargar el sonido de salto enemigo.\n";
-    }
-
-    // Cargar texturas alternativas
-    if (!texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'goomba1.png'" << std::endl;
-        return;
-    }
-    if (!texturaEnemigo2.loadFromFile("assets/img/img_finales/koopa.png")) {
-        std::cerr << "Error: No se pudo cargar el recurso 'koopa.png'" << std::endl;
-        return;
-    }
-
-    enemigoSprite.setTexture(texturaEnemigo1);  // Asigna la textura inicial
 }
 
-// Constructor que faltaba: recibe posición y color
-Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
-    : Enemigo(position, color, 400.f) // Puedes ajustar el valor de groundLevel según tu juego
-{}
-
-// Constructor para solo posición, usa color verde por defecto
-Enemigo::Enemigo(sf::Vector2f position)
-    : Enemigo(position, sf::Color::Green)
-{}
-
-void Enemigo::interactuarConJugador(Personaje& personaje) {
-    if (shape.getGlobalBounds().intersects(personaje.getBounds())) {
-        if (personaje.isJumpingOn(shape)) {
-            eliminado = true; // Elimina al enemigo
-        } else {
-            personaje.perderVida(); // Quita una vida al personaje
-        }
-    }
+void Enemigo::eliminar() {
+    estaEliminado = true;
+    sonidoSalto.play();
 }
 
 void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
-    if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
-        personaje.perderVida();
-        std::cout << "Colision con el enemigo. Se perdio una vida." << std::endl;
-    }
+    interactuarConJugador(personaje);
 }
 
 void Enemigo::dibujar(sf::RenderWindow& window) {
-    window.draw(enemigoSprite);
+    if (!estaEliminado)
+        window.draw(enemigoSprite);
 }

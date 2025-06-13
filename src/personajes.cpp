@@ -5,7 +5,7 @@
 #include <SFML/Audio.hpp>
 
 Personaje::Personaje(sf::Vector2f position) {
-    vidas = 3;
+    vidas = 1;
     sprite.setPosition(position);
 
     // Cargar texturas pequeñas
@@ -16,6 +16,11 @@ Personaje::Personaje(sf::Vector2f position) {
         }
         texturasPequeno.push_back(textura);
     }
+
+    // Crear algunas plataformas de ejemplo (esto puede variar según tu diseño)
+    sf::RectangleShape plataforma(sf::Vector2f(100, 20));  // Una plataforma de 100x20 píxeles
+    plataforma.setPosition(100, 500);  // Establece su posición en el escenario
+    plataformas.push_back(plataforma);  // Agrega la plataforma al vector
 
     // Cargar texturas grandes
     for (int i = 1; i <= 3; i++) {
@@ -56,7 +61,7 @@ void Personaje::moverIzquierda() {
 }
 
 void Personaje::moverDerecha() {
-    if (sprite.getPosition().x < 700)
+    if (sprite.getPosition().x < 1200)
         sprite.move(1.5, 0);
     enReposo = false;
 }
@@ -85,7 +90,21 @@ void Personaje::actualizarGravedad() {
         sprite.move(0, velocidadSalto);
         velocidadSalto += gravedad;
 
-        if (sprite.getPosition().y >= 400) {
+        // Verificar si el personaje está tocando alguna plataforma
+        for (const auto& plataforma : plataformas) {
+            if (getBounds().intersects(plataforma.getGlobalBounds())) {
+                // Si el personaje está tocando un bloque desde arriba, se detiene en él
+                if (sprite.getPosition().y + sprite.getGlobalBounds().height <= plataforma.getPosition().y) {
+                    sprite.setPosition(sprite.getPosition().x, plataforma.getPosition().y - sprite.getGlobalBounds().height);
+                    saltando = false;
+                    velocidadSalto = 0;
+                    enReposo = true;
+                }
+            }
+        }
+
+        // Si el personaje no está tocando plataformas y cae al suelo, detén el salto
+        if (sprite.getPosition().y >= 550) {
             saltando = false;
             velocidadSalto = 0;
             enReposo = true;
@@ -94,21 +113,14 @@ void Personaje::actualizarGravedad() {
 }
 
 void Personaje::actualizarAnimacion() {
-    if (vidas <= 0) return;  // No animar si está "muerto"
-
+    // Aquí podrías añadir la lógica para cambiar las texturas según el movimiento del personaje
     if (enReposo) {
-        if (!texturasPequeno.empty()) {
-            sprite.setTexture(texturasPequeno[0]);
-        }
+        // Si está en reposo, usa la primera textura
+        sprite.setTexture(texturasPequeno[0]);
     } else {
-        if (relojAnimacion.getElapsedTime().asMilliseconds() > 100) {
-            const std::vector<sf::Texture>& texturas = esGrande ? texturasGrande : texturasPequeno;
-            if (!texturas.empty()) {
-                frameActual = (frameActual + 1) % texturas.size();
-                sprite.setTexture(texturas[frameActual]);
-            }
-            relojAnimacion.restart();
-        }
+        // Si está en movimiento, cambia entre texturas
+        frameActual = (frameActual + 1) % texturasPequeno.size();
+        sprite.setTexture(texturasPequeno[frameActual]);
     }
 }
 
@@ -125,23 +137,40 @@ void Personaje::perderVida() {
         vidas--;
 
         if (vidas == 0) {
-            // Mostrar imagen de muerte y reproducir música
+            // Cambiar a la textura de muerte
             sprite.setTexture(texturaMuerte);
-            sonidoMuerte.play();
-
-            // Bloquear 3 segundos (no ideal, pero simple)
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-
-            // Puedes agregar aquí: cerrar el juego, reiniciar, mostrar menú, etc.
+            
+            // Reproducir el sonido de muerte
+            if (sonidoMuerte.getStatus() != sf::Sound::Playing) {
+                sonidoMuerte.play();
+            }
         }
     }
 }
 
-bool Personaje::isJumpingOn(sf::RectangleShape& enemy) {
-    return (sprite.getPosition().y < enemy.getPosition().y) &&
-           sprite.getGlobalBounds().intersects(enemy.getGlobalBounds());
+bool Personaje::isJumpingOn(Enemigo& enemy) {
+    // Verifica si el personaje está por encima del enemigo y está saltando
+    if (saltando && getBounds().intersects(enemy.getBounds())) {
+        return true;
+    }
+    return false;
 }
 
 sf::FloatRect Personaje::getBounds() const {
     return sprite.getGlobalBounds();
+}
+
+void Personaje::restablecer() {
+    // Restablecer las vidas del personaje
+    vidas = 3;  // O cualquier número inicial de vidas
+
+    // Restablecer la posición del personaje
+    sprite.setPosition(posicionInicial);
+
+    // Puedes restablecer otros atributos si es necesario (por ejemplo, tamaño, estado de salto)
+    velocidadSalto = 0;
+    saltando = false;
+    esGrande = false;
+
+    // Restablecer cualquier otro atributo o estado necesario
 }
