@@ -1,4 +1,4 @@
-#include "personajes.h"
+#include "personajes.hpp"
 #include <iostream>
 #include <thread>     // Para std::this_thread::sleep_for
 #include <chrono>     // Para std::chrono::seconds
@@ -10,12 +10,13 @@ Personaje::Personaje(sf::Vector2f position) {
 
     // Cargar texturas pequeñas
     for (int i = 1; i <= 11; i++) {
-        sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/img_finales/p_principal 1." + std::to_string(i) + ".png")) {
+        auto textura = std::make_shared<sf::Texture>();
+        if (!textura->loadFromFile("assets/img/img_finales/p_principal 1." + std::to_string(i) + ".png")) {
             std::cerr << "Error cargando p_principal 1." << i << ".png\n";
         }
         texturasPequeno.push_back(textura);
     }
+
 
     // Crear algunas plataformas de ejemplo (esto puede variar según tu diseño)
     sf::RectangleShape plataforma(sf::Vector2f(100, 20));  // Una plataforma de 100x20 píxeles
@@ -24,12 +25,13 @@ Personaje::Personaje(sf::Vector2f position) {
 
     // Cargar texturas grandes
     for (int i = 1; i <= 3; i++) {
-        sf::Texture textura;
-        if (!textura.loadFromFile("assets/img/img_finales/p_grande" + std::to_string(i) + ".png")) {
-            std::cerr << "Error cargando p_grande" << i << ".png\n";
-        }
-        texturasGrande.push_back(textura);
+    auto textura = std::make_shared<sf::Texture>();
+    if (!textura->loadFromFile("assets/img/img_finales/p_grande" + std::to_string(i) + ".png")) {
+        std::cerr << "Error cargando p_grande" << i << ".png\n";
     }
+    texturasGrande.push_back(textura);
+}
+
 
     // Cargar textura de muerte
     if (!texturaMuerte.loadFromFile("assets/img/img_finales/p_muriendo.png")) {
@@ -44,7 +46,7 @@ Personaje::Personaje(sf::Vector2f position) {
 
     // Establecer textura inicial
     if (!texturasPequeno.empty()) {
-        sprite.setTexture(texturasPequeno[0]);
+        sprite.setTexture(*texturasPequeno[0]);
     }
 
     enReposo = true;
@@ -81,7 +83,7 @@ void Personaje::transformarEnGrande() {
     esGrande = true;
     frameActual = 0;
     if (!texturasGrande.empty()) {
-        sprite.setTexture(texturasGrande[frameActual]);
+        sprite.setTexture(*texturasGrande[frameActual]);  // Esta es la textura correcta
     }
 }
 
@@ -101,6 +103,12 @@ void Personaje::actualizarGravedad() {
                     enReposo = true;
                 }
             }
+
+            // Control de reposo: si no se presiona ninguna tecla de movimiento, está en reposo
+            if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+                !sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                detenerMovimiento(); 
+            }
         }
 
         // Si el personaje no está tocando plataformas y cae al suelo, detén el salto
@@ -112,15 +120,19 @@ void Personaje::actualizarGravedad() {
     }
 }
 
+void Personaje::detenerMovimiento() {
+    enReposo = true;
+    frameActual = 0; 
+}
+
 void Personaje::actualizarAnimacion() {
-    // Aquí podrías añadir la lógica para cambiar las texturas según el movimiento del personaje
     if (enReposo) {
         // Si está en reposo, usa la primera textura
-        sprite.setTexture(texturasPequeno[0]);
+        sprite.setTexture(*texturasPequeno[0]);
     } else {
         // Si está en movimiento, cambia entre texturas
         frameActual = (frameActual + 1) % texturasPequeno.size();
-        sprite.setTexture(texturasPequeno[frameActual]);
+        sprite.setTexture(*texturasPequeno[frameActual]);
     }
 }
 
@@ -170,7 +182,9 @@ void Personaje::restablecer() {
     // Puedes restablecer otros atributos si es necesario (por ejemplo, tamaño, estado de salto)
     velocidadSalto = 0;
     saltando = false;
-    esGrande = false;
+    esGrande = false;    
+}
 
-    // Restablecer cualquier otro atributo o estado necesario
+void Personaje::perderTodasLasVidas() {
+    vidas = 0;
 }

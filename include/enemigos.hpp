@@ -1,11 +1,11 @@
-#ifndef ENEMIGOS_H
-#define ENEMIGOS_H
+#ifndef ENEMIGOS_HPP
+#define ENEMIGOS_HPP
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <vector>
 
-class Personaje; // Declaración adelantada
+class Personaje;  // Declaración adelantada
 
 class Enemigo {
 private:
@@ -16,10 +16,9 @@ private:
     sf::SoundBuffer saltoEnemigoBuffer;
     sf::Sound sonidoSalto;
 
-    int direccion; // -1: izquierda, 1: derecha
-    bool estaEliminado;
-
-    int frameActual;
+    int direccion = -1; // -1: izquierda, 1: derecha
+    int frameActual = 0;
+    bool estaEliminado = false;
     sf::Clock relojAnimacion;
 
 public:
@@ -35,9 +34,9 @@ public:
     void eliminar();
     void dibujar(sf::RenderWindow& window);
 
-    // Getter para el sprite, útil para colisiones o debug
-    sf::FloatRect getBounds() const { return enemigoSprite.getGlobalBounds(); }
-    bool estaActivo() const { return !estaEliminado; }
+    // Accesores
+    sf::FloatRect getBounds() const;
+    bool estaActivo() const;
 };
 
 #endif // ENEMIGOS_H

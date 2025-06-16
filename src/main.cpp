@@ -4,10 +4,14 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include "personajes.h"
-#include "enemigos.h"
-#include "jefe.h"
-#include "escenario.h"
+#include "personajes.hpp"
+#include "enemigos.hpp"
+#include "jefe.hpp"
+#include "escenario.hpp"
+#include "hud.hpp"
+#include "puntaje.hpp"
+
+HUD hud;
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(1200, 675), "Cetianos Bros");
@@ -33,8 +37,9 @@ int main() {
     if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) return -1;
     musicaJefe.setLoop(true);
 
-    float groundLevel = 800.0f;
+    float groundLevel = 700.0f;
     float tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
+    float tiempoTranscurrido = 0.0f;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -43,15 +48,16 @@ int main() {
                 window.close();
         }
 
-        float tiempoTranscurrido = relojJuego.getElapsedTime().asSeconds();
-        
+        tiempoTranscurrido = relojJuego.getElapsedTime().asSeconds();
+
+        // Generar moneda
         if (relojGenerarMoneda.getElapsedTime().asSeconds() >= 5.0f) {
-            float xAleatorio = static_cast<float>(100 + std::rand() % 1000); // posición X aleatoria
-            escenario.generarMoneda(xAleatorio, 0); // aparece arriba y cae
+            float xAleatorio = static_cast<float>(100 + std::rand() % 1000);
+            escenario.generarMoneda(xAleatorio, 0);
             relojGenerarMoneda.restart();
         }
 
-        // Generar enemigos si no ha aparecido el jefe
+        // Generar enemigos si aún no aparece el jefe
         if (tiempoTranscurrido < 30) {
             if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= tiempoParaSiguienteEnemigo && enemigos.size() < 10) {
                 enemigos.emplace_back(sf::Vector2f(300 + std::rand() % 700, groundLevel));
@@ -60,7 +66,6 @@ int main() {
             }
         }
 
-        // Cambiar música al aparecer el jefe
         if (tiempoTranscurrido >= 30.0f && personaje.getVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
             musicaFondo.stop();
             musicaJefe.play();
@@ -68,11 +73,9 @@ int main() {
 
         if (!jefeAparecido && tiempoTranscurrido >= 30) {
             jefeAparecido = true;
-            musicaFondo.stop();
-            musicaJefe.play();
         }
 
-        // Controles
+        // Controles del personaje
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.moverIzquierda();
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.moverDerecha();
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.saltar();
@@ -80,9 +83,8 @@ int main() {
         personaje.actualizarGravedad();
         personaje.actualizarAnimacion();
 
-        escenario.actualizarMonedas();
+        escenario.actualizarMonedas(personaje.getBounds());
 
-        // Actualizar enemigos
         for (auto& enemigo : enemigos) {
             enemigo.mover(window, groundLevel);
             enemigo.interactuarConJugador(personaje);
@@ -94,11 +96,10 @@ int main() {
             enemigos.end()
         );
 
-        // Jefe
         if (jefeAparecido) {
             jefe.mover();
             jefe.saltar();
-            jefe.lanzarBolaFuego(window, personaje);
+            jefe.actualizarBolas(window, personaje);
             jefe.verificarColisionConPersonaje(personaje);
         }
 
@@ -107,13 +108,37 @@ int main() {
             break;
         }
 
-        // Verificar fin del juego
+        // Verificar Game Over
         if (personaje.getVidas() <= 0 || tiempoTranscurrido >= 60) {
-            std::cout << "¡Juego terminado!" << std::endl;
+            sf::Font font;
+            if (!font.loadFromFile("assets/img/text/letraPixel.ttf")) {
+                std::cerr << "Error cargando fuente." << std::endl;
+            }
 
-            // Mostrar mensaje y verificar si el jugador quiere reiniciar o salir
+            sf::Text gameOverText;
+            gameOverText.setFont(font);
+            gameOverText.setString("¡GAME OVER!");
+            gameOverText.setCharacterSize(50);
+            gameOverText.setFillColor(sf::Color::Red);
+            gameOverText.setPosition(400, 250);
+
+            sf::Text restartText;
+            restartText.setFont(font);
+            restartText.setString("Presiona ENTER para reiniciar, ESC para salir.");
+            restartText.setCharacterSize(20);
+            restartText.setFillColor(sf::Color::White);
+            restartText.setPosition(350, 320);
+
             bool esperandoRespuesta = true;
-            while (esperandoRespuesta) {
+            while (esperandoRespuesta && window.isOpen()) {
+                sf::Event event;
+                while (window.pollEvent(event)) {
+                    if (event.type == sf::Event::Closed) {
+                        window.close();
+                        esperandoRespuesta = false;
+                    }
+                }
+
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
                     personaje.restablecer();
                     enemigos.clear();
@@ -127,17 +152,29 @@ int main() {
                     window.close();
                     break;
                 }
+
+                window.clear();
+                window.draw(gameOverText);
+                window.draw(restartText);
+                window.display();
             }
         }
 
-        // Dibujar todo
+        // Actualizar HUD
+        hud.actualizar(personaje.getVidas(), escenario.getMonedasRecogidas(), escenario.getEnemigosMuertos(), 120 - tiempoTranscurrido);
+
+        // Dibujo único por frame
         window.clear();
-        escenario.dibujar(window);
+        escenario.dibujar(window, 120 - tiempoTranscurrido);
         personaje.dibujar(window);
         for (auto& enemigo : enemigos) enemigo.dibujar(window);
         if (jefeAparecido) jefe.draw(window);
+        hud.dibujar(window);
         window.display();
     }
+
+    Puntaje::guardarPuntaje(personaje.getVidas() * 3);
+    std::cout << "Puntaje maximo: " << Puntaje::obtenerPuntajeMaximo() << std::endl;
 
     return 0;
 }

@@ -1,5 +1,7 @@
-#include "escenario.h"
+#include "escenario.hpp"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 Escenario::Escenario() {
     if (!fondoTexture.loadFromFile("assets/img/img_finales/fondo_final.jpg")) {
@@ -21,24 +23,52 @@ Escenario::Escenario() {
     if (!font.loadFromFile("assets/img/text/pixely[1].ttf")) {
         std::cerr << "Error al cargar pixely[1].ttf" << std::endl;
     }
+
+    // Texto Monedas
     puntajeText.setFont(font);
     puntajeText.setCharacterSize(24);
     puntajeText.setFillColor(sf::Color::White);
     puntajeText.setPosition(10, 10);
-    puntaje = 0;
+
+    // Texto Enemigos muertos
+    enemigosText.setFont(font);
+    enemigosText.setCharacterSize(24);
+    enemigosText.setFillColor(sf::Color::Red);
+    enemigosText.setPosition(10, 40);
+
+    // Texto Cuenta regresiva
+    cuentaRegresivaText.setFont(font);  // Cambié el nombre aquí a cuentaRegresivaText
+    cuentaRegresivaText.setCharacterSize(24);
+    cuentaRegresivaText.setFillColor(sf::Color::Yellow);
+    cuentaRegresivaText.setPosition(10, 70);
 
     float x = (1200 - (6 * 50)) / 2;
     agregarPlataforma(x, 450);
 }
 
-void Escenario::dibujar(sf::RenderWindow& window) {
+void Escenario::dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) {
     window.draw(fondoSprite);
     for (const auto& plataforma : plataformas)
         window.draw(plataforma);
     for (const auto& moneda : monedas)
         window.draw(moneda);
-    puntajeText.setString("Puntaje: " + std::to_string(puntaje));
+
+    // Texto Monedas
+    puntajeText.setString("Monedas: " + std::to_string(puntaje));
     window.draw(puntajeText);
+
+    // Texto Enemigos muertos
+    enemigosText.setString("Enemigos derrotados: " + std::to_string(enemigosMuertos));
+    window.draw(enemigosText);
+
+    // Texto Cuenta regresiva
+    int minutos = static_cast<int>(tiempoRestanteSegundos) / 60;
+    int segundos = static_cast<int>(tiempoRestanteSegundos) % 60;
+    std::ostringstream oss;
+    oss << "Tiempo restante: " << std::setw(2) << std::setfill('0') << minutos
+        << ":" << std::setw(2) << std::setfill('0') << segundos;
+    cuentaRegresivaText.setString(oss.str());  // Cambié el nombre aquí a cuentaRegresivaText
+    window.draw(cuentaRegresivaText);
 }
 
 void Escenario::agregarPlataforma(float x, float y) {
@@ -85,4 +115,8 @@ void Escenario::actualizarMonedas(const sf::FloatRect& boundsPersonaje) {
 
 void Escenario::incrementarPuntaje(int cantidad) {
     puntaje += cantidad;
+}
+
+void Escenario::incrementarEnemigosMuertos() {
+    enemigosMuertos++;
 }

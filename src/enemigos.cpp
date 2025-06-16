@@ -1,5 +1,5 @@
-#include "enemigos.h"
-#include "personajes.h"
+#include "enemigos.hpp"
+#include "personajes.hpp"
 #include <iostream>
 
 Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
@@ -11,28 +11,28 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
     for (int i = 1; i <= 2; ++i) {
         sf::Texture textura;
         if (!textura.loadFromFile("assets/img/img_finales/goomba" + std::to_string(i) + ".png")) {
-            std::cerr << "Error cargando goomba" << i << ".png" << std::endl;
+            std::cerr << "Error cargando goomba" << i << ".png\n";
             continue;
         }
         texturasMovimiento.push_back(textura);
     }
 
-    // Establecer textura inicial si se cargó correctamente
+    // Establecer textura inicial si se cargó al menos una
     if (!texturasMovimiento.empty()) {
         enemigoSprite.setTexture(texturasMovimiento[0]);
     }
 
-    // Posición del enemigo
+    // Establecer posición del enemigo
     enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
 
-    // Cargar sonido de salto del enemigo
+    // Cargar sonido de salto enemigo
     if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
         std::cerr << "Error al cargar sonido de salto enemigo.\n";
     } else {
         sonidoSalto.setBuffer(saltoEnemigoBuffer);
     }
 
-    // Cargar texturas extra (aunque actualmente no se usan)
+    // Cargar otras texturas (opcional)
     texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png");
     texturaEnemigo2.loadFromFile("assets/img/img_finales/koopa.png");
 }
@@ -53,16 +53,17 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         relojAnimacion.restart();
     }
 
-    // Mantener al enemigo en el suelo
+    // Ajustar posición en el suelo
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
     // Movimiento lateral
-    enemigoSprite.move(direccion * 0.2f, 0.f);
+    enemigoSprite.move(direccion * 0.3f, 0.f);
 
-    // Rebotar en los bordes de la ventana
-    if (enemigoSprite.getPosition().x <= 0 || enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
+    // Cambiar dirección al llegar a los bordes
+    if (enemigoSprite.getPosition().x <= 0 ||
+        enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
         direccion = -direccion;
     }
 
@@ -74,11 +75,15 @@ void Enemigo::interactuarConJugador(Personaje& personaje) {
 
     if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
         if (personaje.isJumpingOn(*this)) {
-            this->eliminar();
+            eliminar();
         } else {
             personaje.perderVida();
         }
     }
+}
+
+void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
+    interactuarConJugador(personaje);
 }
 
 void Enemigo::eliminar() {
@@ -86,11 +91,16 @@ void Enemigo::eliminar() {
     sonidoSalto.play();
 }
 
-void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
-    interactuarConJugador(personaje);
+void Enemigo::dibujar(sf::RenderWindow& window) {
+    if (!estaEliminado) {
+        window.draw(enemigoSprite);
+    }
 }
 
-void Enemigo::dibujar(sf::RenderWindow& window) {
-    if (!estaEliminado)
-        window.draw(enemigoSprite);
+sf::FloatRect Enemigo::getBounds() const {
+    return enemigoSprite.getGlobalBounds();
+}
+
+bool Enemigo::estaActivo() const {
+    return !estaEliminado;
 }
