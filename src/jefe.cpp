@@ -2,57 +2,58 @@
 #include "personajes.hpp"
 #include <iostream>
 
-using namespace std;
-
 Jefe::Jefe(sf::Vector2f position) {
     if (!jefeTexture.loadFromFile("assets/img/img_finales/jefe.png")) {
-        std::cerr << "Error: No se pudo cargar 'jefe.png'\n";
-        return;
+        std::cerr << "Error al cargar jefe.png\n";
     }
     jefeSprite.setTexture(jefeTexture);
     jefeSprite.setPosition(position);
 
-    if (!bolaFuegoTexture.loadFromFile("assets/img/img_finales/bola_fuego.png")) {
-        std::cerr << "Error: No se pudo cargar 'bola_fuego.png'\n";
-        bolaFuegoVisible = false; // Imagen no cargada, usamos marcador visual
-    } else {
-        bolaFuegoVisible = true;
-    }
-
     if (!banderaTexture.loadFromFile("assets/img/img_finales/bandera.png")) {
-        std::cerr << "Error: No se pudo cargar 'bandera.png'\n";
-        return;
+        std::cerr << "Error al cargar bandera.png\n";
     }
     banderaSprite.setTexture(banderaTexture);
-    banderaSprite.setPosition(position.x + 100, position.y);
+    banderaSprite.setPosition(1000, 550);
+    banderaSprite.setScale(0.9f, 0.9f);  
 
     relojAparicion.restart();
 
-    if (!bufferBolaFuego.loadFromFile("assets/img/sound/bola_fuego.ogg"))
-        std::cerr << "Error: No se pudo cargar 'bola_fuego.ogg'\n";
-    sonidoBolaFuego.setBuffer(bufferBolaFuego);
-
     if (!bufferSalto.loadFromFile("assets/img/sound/salto_jefe.ogg"))
-        std::cerr << "Error: No se pudo cargar 'salto_jefe.ogg'\n";
+        std::cerr << "Error al cargar sonido salto_jefe.ogg\n";
     sonidoSalto.setBuffer(bufferSalto);
 
     if (!bufferVictoria.loadFromFile("assets/img/sound/victoria.ogg"))
-        std::cerr << "Error: No se pudo cargar 'victoria.ogg'\n";
+        std::cerr << "Error al cargar sonido victoria.ogg\n";
     sonidoVictoria.setBuffer(bufferVictoria);
 }
 
 void Jefe::mover() {
+    float velocidadMovimiento = 500.f / 3.f;  // 500 píxeles en 3 segundos
     if (relojMovimiento.getElapsedTime().asSeconds() >= 1.0f) {
-        jefeSprite.move(moviendoAdelante ? 100 : -100, 0);
-        moviendoAdelante = !moviendoAdelante;
-        relojMovimiento.restart();
+        // Moverse 500 píxeles hacia adelante y hacia atrás en 3 segundos
+        if (moviendoAdelante) {
+            if (jefeSprite.getPosition().x < 500) {
+                jefeSprite.move(velocidadMovimiento * relojMovimiento.getElapsedTime().asSeconds(), 0);  // Mover hacia la derecha
+            } else {
+                moviendoAdelante = false;
+                relojMovimiento.restart();  // Reiniciar el reloj cuando cambie la dirección
+            }
+        } else {
+            if (jefeSprite.getPosition().x > 0) {
+                jefeSprite.move(-velocidadMovimiento * relojMovimiento.getElapsedTime().asSeconds(), 0);  // Mover hacia la izquierda
+            } else {
+                moviendoAdelante = true;
+                relojMovimiento.restart();  // Reiniciar el reloj cuando cambie la dirección
+            }
+        }
     }
 
+    // Lógica de salto
     if (enElAire) {
         velocidadY += gravedad;
         jefeSprite.move(0, velocidadY);
         if (jefeSprite.getPosition().y >= 550) {
-            jefeSprite.setPosition(jefeSprite.getPosition().x, 550);
+            jefeSprite.setPosition(jefeSprite.getPosition().x, 550);  // Regresar al suelo
             enElAire = false;
             velocidadY = 0;
         }
@@ -62,50 +63,10 @@ void Jefe::mover() {
 void Jefe::saltar() {
     if (!enElAire && relojSalto.getElapsedTime().asSeconds() >= (3 + rand() % 5)) {
         enElAire = true;
-        velocidadY = velocidadSalto;
+        velocidadY = -100;  // Saltar 100 píxeles hacia arriba
         sonidoSalto.play();
         relojSalto.restart();
     }
-}
-
-void Jefe::lanzarBolaFuego() {
-    sf::Sprite bola;
-    if (bolaFuegoVisible) {
-        bola.setTexture(bolaFuegoTexture);
-    } else {
-        // Si no cargó la imagen, usar marcador rojo
-        sf::Texture* dummyTexture = new sf::Texture();
-        dummyTexture->create(20, 20); // Crear textura temporal
-        bola.setTexture(*dummyTexture);
-        bola.setColor(sf::Color::Red);
-    }
-
-    bola.setPosition(jefeSprite.getPosition().x, jefeSprite.getPosition().y + 25);
-    bolasDeFuego.push_back(bola);
-    sonidoBolaFuego.play();
-    relojBolaFuego.restart();
-}
-
-void Jefe::actualizarBolas(sf::RenderWindow& window, Personaje& personaje) {
-    if (relojBolaFuego.getElapsedTime().asSeconds() >= 4.0f) {
-        lanzarBolaFuego();
-    }
-
-    for (auto& bola : bolasDeFuego) {
-        bola.move(-1.5f, 0);  // Velocidad más suave
-        window.draw(bola);
-
-        if (bola.getGlobalBounds().intersects(personaje.getBounds())) {
-            personaje.perderTodasLasVidas();  // Game over
-        }
-    }
-
-    bolasDeFuego.erase(
-        std::remove_if(bolasDeFuego.begin(), bolasDeFuego.end(),
-                       [](const sf::Sprite& bola) {
-                           return bola.getPosition().x < -50;
-                       }),
-        bolasDeFuego.end());
 }
 
 void Jefe::verificarColisionConPersonaje(Personaje& personaje) {

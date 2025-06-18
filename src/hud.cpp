@@ -8,37 +8,50 @@ HUD::HUD() {
         std::cerr << "Error cargando fuente" << std::endl;
     }
 
-    // Inicialización de los textos (vidas, monedas, enemigos y tiempo)
+    // Configurar estilo común
+    int fontSize = 24;
+    float marginTop = 10;
+    float marginLeft = 10;
+    float spacing = 30;
+
+    // Vidas
     textoVidas.setFont(font);
-    textoVidas.setCharacterSize(24);
+    textoVidas.setCharacterSize(fontSize);
     textoVidas.setFillColor(sf::Color::White);
+    textoVidas.setPosition(marginLeft, marginTop);
 
+    // Monedas
     textoMonedas.setFont(font);
-    textoMonedas.setCharacterSize(24);
+    textoMonedas.setCharacterSize(fontSize);
     textoMonedas.setFillColor(sf::Color::White);
+    textoMonedas.setPosition(marginLeft, marginTop + spacing);
 
+    // Enemigos
     textoEnemigos.setFont(font);
-    textoEnemigos.setCharacterSize(24);
+    textoEnemigos.setCharacterSize(fontSize);
     textoEnemigos.setFillColor(sf::Color::Red);
+    textoEnemigos.setPosition(marginLeft, marginTop + 2 * spacing);
 
+    // Tiempo restante
     textoTiempoRestante.setFont(font);
-    textoTiempoRestante.setCharacterSize(24);
+    textoTiempoRestante.setCharacterSize(fontSize);
     textoTiempoRestante.setFillColor(sf::Color::Yellow);
+    textoTiempoRestante.setPosition(marginLeft, marginTop + 3 * spacing);
 }
 
 void HUD::actualizar(int vidas, int monedas, int enemigosMuertos, float tiempoRestante) {
-    textoVidas.setString("Vidas: " + std::to_string(vidas));
-    textoMonedas.setString("Monedas: " + std::to_string(monedas));
-    textoEnemigos.setString("Enemigos: " + std::to_string(enemigosMuertos));
+    //textoVidas.setString("Vidas: " + std::to_string(vidas));
+    //textoMonedas.setString("Monedas: " + std::to_string(monedas));
+    //textoEnemigos.setString("Enemigos: " + std::to_string(enemigosMuertos));
 
     int minutos = static_cast<int>(tiempoRestante) / 60;
     int segundos = static_cast<int>(tiempoRestante) % 60;
-    textoTiempoRestante.setString("Tiempo: " + std::to_string(minutos) + ":" + (segundos < 10 ? "0" : "") + std::to_string(segundos));
+    textoTiempoRestante.setString("Tiempo restante: " + std::to_string(minutos) + ":" + (segundos < 10 ? "0" : "") + std::to_string(segundos));
 }
 
 void HUD::dibujar(sf::RenderWindow& window) {
     window.draw(textoVidas);
     window.draw(textoMonedas);
     window.draw(textoEnemigos);
-    window.draw(textoTiempoRestante);  // Dibuja el tiempo restante
+    window.draw(textoTiempoRestante);
 }

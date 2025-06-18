@@ -11,10 +11,10 @@
 class Personaje {
 private:
     sf::Sprite sprite;
-    int vidas = 1;
+    int vidas = 3;
     bool saltando = false;
     bool enReposo = true;
-    bool esGrande = false;
+    bool enPlataforma = false; 
 
     float velocidadSalto = 0.0f;
     float gravedad = 0.5f;
@@ -23,7 +23,6 @@ private:
     sf::Vector2f posicionInicial;
 
     std::vector<std::shared_ptr<sf::Texture>> texturasPequeno;
-    std::vector<std::shared_ptr<sf::Texture>> texturasGrande;
     int frameActual = 0;
 
     sf::Texture texturaMuerte;
@@ -31,6 +30,8 @@ private:
     sf::Sound sonidoMuerte;
 
     std::vector<sf::RectangleShape> plataformas;
+    sf::Music* soundtrack1 = nullptr;
+    sf::Music* soundtrack2 = nullptr;
 
 public:
     Personaje(sf::Vector2f position);
@@ -39,7 +40,6 @@ public:
     void moverIzquierda();
     void moverDerecha();
     void saltar();
-    void transformarEnGrande();
     void actualizarGravedad();
     void actualizarAnimacion();
     void dibujar(sf::RenderWindow& window);
@@ -50,6 +50,12 @@ public:
     bool isJumpingOn(Enemigo& enemy);
     void detenerMovimiento(); 
     void perderTodasLasVidas();
+    void dibujarPlataformas(sf::RenderWindow& window);  // Mantener solo esta declaración
+    void setEnPlataforma(bool estado);
+    void setPosicionY(float y);
+    void setVelocidadY(float velocidadY);
+    void asignarMusica(sf::Music* musica1, sf::Music* musica2);
+    void verificarColisionConPlataforma(const sf::FloatRect& plataformaBounds);
 };
 
-#endif // PERSONAJES_H
+#endif // PERSONAJES_HPP

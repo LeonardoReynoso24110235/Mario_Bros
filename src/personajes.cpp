@@ -1,14 +1,16 @@
+// personajes.cpp
+
 #include "personajes.hpp"
 #include <iostream>
-#include <thread>     // Para std::this_thread::sleep_for
-#include <chrono>     // Para std::chrono::seconds
+#include <thread>
+#include <chrono>
 #include <SFML/Audio.hpp>
 
 Personaje::Personaje(sf::Vector2f position) {
-    vidas = 1;
+    vidas = 3;
     sprite.setPosition(position);
+    posicionInicial = position;
 
-    // Cargar texturas pequeñas
     for (int i = 1; i <= 11; i++) {
         auto textura = std::make_shared<sf::Texture>();
         if (!textura->loadFromFile("assets/img/img_finales/p_principal 1." + std::to_string(i) + ".png")) {
@@ -17,43 +19,23 @@ Personaje::Personaje(sf::Vector2f position) {
         texturasPequeno.push_back(textura);
     }
 
-
-    // Crear algunas plataformas de ejemplo (esto puede variar según tu diseño)
-    sf::RectangleShape plataforma(sf::Vector2f(100, 20));  // Una plataforma de 100x20 píxeles
-    plataforma.setPosition(100, 500);  // Establece su posición en el escenario
-    plataformas.push_back(plataforma);  // Agrega la plataforma al vector
-
-    // Cargar texturas grandes
-    for (int i = 1; i <= 3; i++) {
-    auto textura = std::make_shared<sf::Texture>();
-    if (!textura->loadFromFile("assets/img/img_finales/p_grande" + std::to_string(i) + ".png")) {
-        std::cerr << "Error cargando p_grande" << i << ".png\n";
-    }
-    texturasGrande.push_back(textura);
-}
-
-
-    // Cargar textura de muerte
     if (!texturaMuerte.loadFromFile("assets/img/img_finales/p_muriendo.png")) {
         std::cerr << "Error cargando p_muriendo.png\n";
     }
 
-    // Cargar sonido de muerte
     if (!bufferMuerte.loadFromFile("assets/img/sound/muerte.ogg")) {
         std::cerr << "Error cargando muriendo.ogg\n";
     }
     sonidoMuerte.setBuffer(bufferMuerte);
 
-    // Establecer textura inicial
     if (!texturasPequeno.empty()) {
         sprite.setTexture(*texturasPequeno[0]);
     }
 
     enReposo = true;
-}
-
-Personaje::Personaje(sf::Vector2f position, sf::Color color) : Personaje(position) {
-    sprite.setColor(color);
+    saltando = false;
+    velocidadSalto = 0;
+    gravedad = 0.5f;
 }
 
 void Personaje::moverIzquierda() {
@@ -71,19 +53,8 @@ void Personaje::moverDerecha() {
 void Personaje::saltar() {
     if (!saltando) {
         saltando = true;
-        velocidadSalto = alturaSalto;
+        velocidadSalto = -10;
         enReposo = false;
-        if (posicionInicial == sf::Vector2f(0, 0)) {
-            posicionInicial = sprite.getPosition();
-        }
-    }
-}
-
-void Personaje::transformarEnGrande() {
-    esGrande = true;
-    frameActual = 0;
-    if (!texturasGrande.empty()) {
-        sprite.setTexture(*texturasGrande[frameActual]);  // Esta es la textura correcta
     }
 }
 
@@ -92,27 +63,8 @@ void Personaje::actualizarGravedad() {
         sprite.move(0, velocidadSalto);
         velocidadSalto += gravedad;
 
-        // Verificar si el personaje está tocando alguna plataforma
-        for (const auto& plataforma : plataformas) {
-            if (getBounds().intersects(plataforma.getGlobalBounds())) {
-                // Si el personaje está tocando un bloque desde arriba, se detiene en él
-                if (sprite.getPosition().y + sprite.getGlobalBounds().height <= plataforma.getPosition().y) {
-                    sprite.setPosition(sprite.getPosition().x, plataforma.getPosition().y - sprite.getGlobalBounds().height);
-                    saltando = false;
-                    velocidadSalto = 0;
-                    enReposo = true;
-                }
-            }
-
-            // Control de reposo: si no se presiona ninguna tecla de movimiento, está en reposo
-            if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
-                !sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                detenerMovimiento(); 
-            }
-        }
-
-        // Si el personaje no está tocando plataformas y cae al suelo, detén el salto
         if (sprite.getPosition().y >= 550) {
+            sprite.setPosition(sprite.getPosition().x, 550);
             saltando = false;
             velocidadSalto = 0;
             enReposo = true;
@@ -122,15 +74,13 @@ void Personaje::actualizarGravedad() {
 
 void Personaje::detenerMovimiento() {
     enReposo = true;
-    frameActual = 0; 
+    frameActual = 0;
 }
 
 void Personaje::actualizarAnimacion() {
     if (enReposo) {
-        // Si está en reposo, usa la primera textura
         sprite.setTexture(*texturasPequeno[0]);
     } else {
-        // Si está en movimiento, cambia entre texturas
         frameActual = (frameActual + 1) % texturasPequeno.size();
         sprite.setTexture(*texturasPequeno[frameActual]);
     }
@@ -147,12 +97,8 @@ int Personaje::getVidas() const {
 void Personaje::perderVida() {
     if (vidas > 0) {
         vidas--;
-
         if (vidas == 0) {
-            // Cambiar a la textura de muerte
             sprite.setTexture(texturaMuerte);
-            
-            // Reproducir el sonido de muerte
             if (sonidoMuerte.getStatus() != sf::Sound::Playing) {
                 sonidoMuerte.play();
             }
@@ -161,9 +107,10 @@ void Personaje::perderVida() {
 }
 
 bool Personaje::isJumpingOn(Enemigo& enemy) {
-    // Verifica si el personaje está por encima del enemigo y está saltando
     if (saltando && getBounds().intersects(enemy.getBounds())) {
-        return true;
+        if (sprite.getPosition().y < enemy.getBounds().top) {
+            return true;
+        }
     }
     return false;
 }
@@ -173,18 +120,43 @@ sf::FloatRect Personaje::getBounds() const {
 }
 
 void Personaje::restablecer() {
-    // Restablecer las vidas del personaje
-    vidas = 3;  // O cualquier número inicial de vidas
-
-    // Restablecer la posición del personaje
+    vidas = 3;
     sprite.setPosition(posicionInicial);
-
-    // Puedes restablecer otros atributos si es necesario (por ejemplo, tamaño, estado de salto)
     velocidadSalto = 0;
     saltando = false;
-    esGrande = false;    
 }
 
 void Personaje::perderTodasLasVidas() {
     vidas = 0;
+    sprite.setTexture(texturaMuerte);
+    if (sonidoMuerte.getStatus() != sf::Sound::Playing) {
+        sonidoMuerte.play();
+    }
+}
+
+void Personaje::verificarColisionConPlataforma(const sf::FloatRect& boundsPlataforma) {
+    sf::FloatRect personajeBounds = sprite.getGlobalBounds();
+
+    if (personajeBounds.intersects(boundsPlataforma) && velocidadSalto >= 0) {
+        float personajeBottom = personajeBounds.top + personajeBounds.height;
+        float plataformaTop = boundsPlataforma.top;
+
+        if (personajeBottom - 5.0f <= plataformaTop) {
+            sprite.setPosition(sprite.getPosition().x, plataformaTop - personajeBounds.height);
+            saltando = false;
+            velocidadSalto = 0;
+            enReposo = true;
+        }
+    }
+}
+
+void Personaje::asignarMusica(sf::Music* musica1, sf::Music* musica2) {
+    soundtrack1 = musica1;
+    soundtrack2 = musica2;
+}
+
+void Personaje::dibujarPlataformas(sf::RenderWindow& window) {
+    for (const auto& plataforma : plataformas) {
+        window.draw(plataforma);
+    }
 }

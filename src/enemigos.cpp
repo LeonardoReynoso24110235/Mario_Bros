@@ -22,7 +22,7 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
         enemigoSprite.setTexture(texturasMovimiento[0]);
     }
 
-    // Establecer posición del enemigo
+    // Establecer posición del enemigo: asegúrate de que la coordenada Y esté ajustada por groundLevel
     enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
 
     // Cargar sonido de salto enemigo
@@ -53,7 +53,7 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         relojAnimacion.restart();
     }
 
-    // Ajustar posición en el suelo
+    // Ajustar posición en el suelo: asegura que el enemigo nunca se pase del nivel de suelo
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
@@ -62,8 +62,7 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
     enemigoSprite.move(direccion * 0.3f, 0.f);
 
     // Cambiar dirección al llegar a los bordes
-    if (enemigoSprite.getPosition().x <= 0 ||
-        enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
+    if (enemigoSprite.getPosition().x <= 0 || enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
         direccion = -direccion;
     }
 
@@ -74,9 +73,13 @@ void Enemigo::interactuarConJugador(Personaje& personaje) {
     if (estaEliminado) return;
 
     if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
+        std::cout << "Colisión detectada entre personaje y enemigo." << std::endl;
+
         if (personaje.isJumpingOn(*this)) {
+            std::cout << "Personaje saltó sobre el enemigo." << std::endl;
             eliminar();
         } else {
+            std::cout << "Personaje tocó el enemigo." << std::endl;
             personaje.perderVida();
         }
     }

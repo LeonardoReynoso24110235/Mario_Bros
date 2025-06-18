@@ -10,10 +10,13 @@
 #include "escenario.hpp"
 #include "hud.hpp"
 #include "puntaje.hpp"
+#include <locale>
+#include <clocale>
 
 HUD hud;
 
 int main() {
+    std::setlocale(LC_ALL, "es_ES.UTF-8");
     sf::RenderWindow window(sf::VideoMode(1200, 675), "Cetianos Bros");
 
     Escenario escenario;
@@ -28,6 +31,7 @@ int main() {
     std::vector<Enemigo> enemigos;
     Jefe jefe(sf::Vector2f(1000, 550));
 
+    // Música
     sf::Music musicaFondo;
     if (!musicaFondo.openFromFile("assets/img/sound/soundtrack.ogg")) return -1;
     musicaFondo.setLoop(true);
@@ -37,7 +41,9 @@ int main() {
     if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) return -1;
     musicaJefe.setLoop(true);
 
-    float groundLevel = 700.0f;
+    personaje.asignarMusica(&musicaFondo, &musicaJefe);  // Asignar punteros de música al personaje
+
+    float groundLevel = 650.0f;
     float tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
     float tiempoTranscurrido = 0.0f;
 
@@ -75,12 +81,15 @@ int main() {
             jefeAparecido = true;
         }
 
-        // Controles del personaje
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.moverIzquierda();
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.moverDerecha();
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.saltar();
+        // Controles del personaje solo si tiene vidas
+        if (personaje.getVidas() > 0) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.moverIzquierda();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.moverDerecha();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.saltar();
+        }
 
         personaje.actualizarGravedad();
+        escenario.verificarColisionConPlataformas(personaje);  // ✅ AQUÍ DEBE IR
         personaje.actualizarAnimacion();
 
         escenario.actualizarMonedas(personaje.getBounds());
@@ -98,9 +107,8 @@ int main() {
 
         if (jefeAparecido) {
             jefe.mover();
-            jefe.saltar();
-            jefe.actualizarBolas(window, personaje);
-            jefe.verificarColisionConPersonaje(personaje);
+            jefe.saltar();            
+            jefe.verificarColisionConPersonaje(personaje);            
         }
 
         if (jefeAparecido && jefe.verificarColisionConBandera(personaje)) {
@@ -108,8 +116,12 @@ int main() {
             break;
         }
 
-        // Verificar Game Over
-        if (personaje.getVidas() <= 0 || tiempoTranscurrido >= 60) {
+        // GAME OVER si se queda sin vidas o se acaba el tiempo
+        if ((personaje.getVidas() <= 0 || tiempoTranscurrido >= 60)) {
+            if (personaje.getVidas() > 0) {
+                personaje.perderTodasLasVidas();  // Esto detiene la música y muestra sprite de muerte
+            }
+
             sf::Font font;
             if (!font.loadFromFile("assets/img/text/letraPixel.ttf")) {
                 std::cerr << "Error cargando fuente." << std::endl;
@@ -117,14 +129,14 @@ int main() {
 
             sf::Text gameOverText;
             gameOverText.setFont(font);
-            gameOverText.setString("¡GAME OVER!");
+            gameOverText.setString("GAME OVER");
             gameOverText.setCharacterSize(50);
             gameOverText.setFillColor(sf::Color::Red);
             gameOverText.setPosition(400, 250);
 
             sf::Text restartText;
             restartText.setFont(font);
-            restartText.setString("Presiona ENTER para reiniciar, ESC para salir.");
+            restartText.setString("Presiona ENTER para reiniciar, \n\nESC para salir.");
             restartText.setCharacterSize(20);
             restartText.setFillColor(sf::Color::White);
             restartText.setPosition(350, 320);
@@ -145,6 +157,8 @@ int main() {
                     jefeAparecido = false;
                     relojJuego.restart();
                     relojGenerarEnemigo.restart();
+                    musicaFondo.play();
+                    musicaJefe.stop();
                     break;
                 }
 
@@ -154,6 +168,8 @@ int main() {
                 }
 
                 window.clear();
+                escenario.dibujar(window, 120 - tiempoTranscurrido);
+                personaje.dibujar(window);
                 window.draw(gameOverText);
                 window.draw(restartText);
                 window.display();
@@ -166,12 +182,15 @@ int main() {
         // Dibujo único por frame
         window.clear();
         escenario.dibujar(window, 120 - tiempoTranscurrido);
+        personaje.dibujarPlataformas(window);
         personaje.dibujar(window);
         for (auto& enemigo : enemigos) enemigo.dibujar(window);
         if (jefeAparecido) jefe.draw(window);
         hud.dibujar(window);
         window.display();
     }
+    
+    // escenario.verificarColisionConPlataformas(personaje);
 
     Puntaje::guardarPuntaje(personaje.getVidas() * 3);
     std::cout << "Puntaje maximo: " << Puntaje::obtenerPuntajeMaximo() << std::endl;

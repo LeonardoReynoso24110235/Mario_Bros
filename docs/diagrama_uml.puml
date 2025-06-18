@@ -1,164 +1,91 @@
 @startuml
+
 class Personaje {
-    + caminar : void
-    + saltar : void
-    + recogerPuntos : void
-    + perderVida : void
-    + eliminarEnemigo : void    
+    - vidas : int
+    - sprite : Sprite
+    - saltando : bool
+    - velocidadSalto : float
+
+    + MoverIzquierda() : void
+    + MoverDerecha() : void
+    + Saltar() : void
+    + ActualizarGravedad() : void
+    + PerderVida() : void
+    + EliminarEnemigo() : void
+    + VerificarColisionConPlataforma() : void
+    + Dibujar() : void
+    + Restablecer() : void
 }
 
 class Enemigo {
-    + atacar : void
-    + recibirDaño : void
-    + eliminar : void
-    + saltar : void
-    + caminar : void
+    - direccion : int
+    - velocidad : float
+
+    + Caminar() : void
+    + Atacar() : void
+    + RecibirDanio() : void
+    + Eliminar() : void
+    + GetBounds() : FloatRect
+}
+
+class Jefe {
+    - tiempoSalto : float    
+
+    + Actualizar() : void    
+    + Saltar() : void
 }
 
 class Moneda {
     - valor : int
-}
 
-class Escenario {
-   
+    + Caer() : void
+    + DetectarColision() : void
 }
 
 class Plataforma {
-
+    - sprite : Sprite
 }
 
-class juego {
-    private:
+class Escenario {
+    - plataformas : vector
+    - monedas : vector
+    - fondo : Sprite
 
-    public:
-        juegoMario();
-        ~juegoMario();
+    + Dibujar() : void
+    + AgregarPlataforma() : void
+    + Actualizar() : void
+    + ActualizarMonedas() : void
+    + VerificarColisiones() : void
 }
 
-class personaje {
-    private:
-        int x;
-        int y;
-        int vida;
-        int puntos;
+class Puntaje {
+    - monedas : int
+    - enemigosEliminados : int
 
-    public:
-        personaje();
-        ~personaje();
-        void mover(int dx, int dy);
-        void saltar();
-        void disparar();
+    + Incrementar() : void
+    + Resetear() : void
+    + ObtenerPuntaje() : int
 }
 
-class enemigo {
-    private:
-        int x;
-        int y;
-        int vida;
+class HUD {
+    - textoVidas : Text
+    - textoPuntaje : Text
 
-    public:
-        enemigo();
-        ~enemigo();
-        void mover(int dx, int dy);
-        void atacar();
+    + Dibujar() : void
+    + Actualizar() : void
 }
 
-class vidas {
-    private:
-        int cantidad;
-
-    public:
-        vidas();
-        ~vidas();
-        void agregarVida();
-        void quitarVida();
+class Main {
+    + main() : int
 }
 
-class monedas {
-    private:
-        int cantidad;
-
-    public:
-        monedas();
-        ~monedas();
-        void agregarMoneda();
-        void quitarMoneda();
-}
-
-class bloque {
-    private:
-        int x;
-        int y;
-        
-    public:
-        bloque();
-        ~bloque();
-        void golpear();
-}
-
-class bloqueEspecial {
-    private:
-        int x;
-        int y;
-
-    public:
-        bloqueEspecial();
-        ~bloqueEspecial();
-        void golpear();
-}
-
-class powerUp {
-    private:
-        int tipo;
-
-    public:
-        powerUp();
-        ~powerUp();
-        void aplicarEfecto();
-}
-
-class jefe {
-    private:
-        int x;
-        int y;
-        int vida;
-
-    public:
-        jefe();
-        ~jefe();
-        void atacar();
-        void recibirDanio(int danio);
-}
-
-class puntaje {
-    private:
-        int puntosTotales;
-
-    public:
-        puntaje();
-        ~puntaje();
-        void agregarPuntos(int puntos);
-        void mostrarPuntaje();
-}
-
-personaje "1" *-- "3" vidas
-personaje "1" *-- "*" monedas
-monedas "1" *-- "1" cantidad
 Personaje "1" *-- "*" Enemigo
 Personaje "1" o-- "*" Moneda
 Personaje "1" o-- "1" Escenario
-Escenario "1" o-- "*" Plataforma
-Personaje "1" *-- saltar
-Enemigo "1" *-- saltar
-Personaje "1" *-- caminar
-Enemigo "1" *-- caminar
-Personaje "1" *-- recogerPuntos
-Personaje "1" *-- perderVida
-Personaje "1" *-- eliminarEnemigo
-Enemigo "1" *-- atacar
-Enemigo "1" *-- recibirDaño
-Enemigo "1" *-- eliminar
-Moneda "1" *-- "1" valor
-Moneda "1" *-- recogerPuntos
+Escenario "1" *-- "6" Plataforma
+Escenario "1" *-- "*" Moneda
+Personaje "1" o-- "1" HUD
+Jefe --|> Enemigo
+Personaje "1" *-- "1" Jefe
 
 @enduml

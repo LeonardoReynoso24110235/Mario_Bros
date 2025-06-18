@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "personajes.hpp"  // Asegúrate de incluir el encabezado de Personaje
 
 class Escenario {
 private:
@@ -32,6 +33,9 @@ public:
     int getMonedasRecogidas() const { return puntaje; }
     int getEnemigosMuertos() const { return enemigosMuertos; }
     int getTiempoRestante();  // tiempo restante en segundos
+    const std::vector<sf::Sprite>& getPlataformas() const;
+    void verificarColisionConPlataformas(Personaje& personaje);  // Declara el método aquí    
+    void actualizar(float deltaTime, Personaje& personaje);
 };
 
 #endif
