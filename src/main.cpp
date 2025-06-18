@@ -13,11 +13,13 @@
 #include <locale>
 #include <clocale>
 
-HUD hud;
+
 
 int main() {
     std::setlocale(LC_ALL, "es_ES.UTF-8");
     sf::RenderWindow window(sf::VideoMode(1200, 675), "Cetianos Bros");
+
+    HUD hud;
 
     Escenario escenario;
     Personaje personaje(sf::Vector2f(100, 550));
@@ -29,7 +31,7 @@ int main() {
     bool jefeAparecido = false;
 
     std::vector<Enemigo> enemigos;
-    Jefe jefe(sf::Vector2f(1000, 550));
+    Jefe jefe(sf::Vector2f(800, 550));
 
     // Música
     sf::Music musicaFondo;
@@ -43,7 +45,7 @@ int main() {
 
     personaje.asignarMusica(&musicaFondo, &musicaJefe);  // Asignar punteros de música al personaje
 
-    float groundLevel = 650.0f;
+    float groundLevel = 600.0f;
     float tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
     float tiempoTranscurrido = 0.0f;
 
@@ -89,7 +91,7 @@ int main() {
         }
 
         personaje.actualizarGravedad();
-        escenario.verificarColisionConPlataformas(personaje);  // ✅ AQUÍ DEBE IR
+        escenario.verificarColisionConPlataformas(personaje); 
         personaje.actualizarAnimacion();
 
         escenario.actualizarMonedas(personaje.getBounds());
@@ -182,15 +184,13 @@ int main() {
         // Dibujo único por frame
         window.clear();
         escenario.dibujar(window, 120 - tiempoTranscurrido);
+        if (jefeAparecido) jefe.draw(window);
         personaje.dibujarPlataformas(window);
         personaje.dibujar(window);
-        for (auto& enemigo : enemigos) enemigo.dibujar(window);
-        if (jefeAparecido) jefe.draw(window);
+        for (auto& enemigo : enemigos) enemigo.dibujar(window);        
         hud.dibujar(window);
         window.display();
-    }
-    
-    // escenario.verificarColisionConPlataformas(personaje);
+    }    
 
     Puntaje::guardarPuntaje(personaje.getVidas() * 3);
     std::cout << "Puntaje maximo: " << Puntaje::obtenerPuntajeMaximo() << std::endl;

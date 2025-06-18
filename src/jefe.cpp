@@ -9,12 +9,11 @@ Jefe::Jefe(sf::Vector2f position) {
     jefeSprite.setTexture(jefeTexture);
     jefeSprite.setPosition(position);
 
-    if (!banderaTexture.loadFromFile("assets/img/img_finales/bandera.png")) {
+    if (!banderaTexture.loadFromFile("assets/img/img_finales/bandera_4.png")) {
         std::cerr << "Error al cargar bandera.png\n";
     }
     banderaSprite.setTexture(banderaTexture);
-    banderaSprite.setPosition(1000, 550);
-    banderaSprite.setScale(0.9f, 0.9f);  
+    banderaSprite.setPosition(1000, 450);    
 
     relojAparicion.restart();
 
@@ -28,34 +27,44 @@ Jefe::Jefe(sf::Vector2f position) {
 }
 
 void Jefe::mover() {
-    float velocidadMovimiento = 500.f / 3.f;  // 500 píxeles en 3 segundos
-    if (relojMovimiento.getElapsedTime().asSeconds() >= 1.0f) {
-        // Moverse 500 píxeles hacia adelante y hacia atrás en 3 segundos
-        if (moviendoAdelante) {
-            if (jefeSprite.getPosition().x < 500) {
-                jefeSprite.move(velocidadMovimiento * relojMovimiento.getElapsedTime().asSeconds(), 0);  // Mover hacia la derecha
-            } else {
-                moviendoAdelante = false;
-                relojMovimiento.restart();  // Reiniciar el reloj cuando cambie la dirección
-            }
-        } else {
-            if (jefeSprite.getPosition().x > 0) {
-                jefeSprite.move(-velocidadMovimiento * relojMovimiento.getElapsedTime().asSeconds(), 0);  // Mover hacia la izquierda
-            } else {
-                moviendoAdelante = true;
-                relojMovimiento.restart();  // Reiniciar el reloj cuando cambie la dirección
-            }
-        }
-    }
+    float tiempoTranscurrido = relojMovimiento.getElapsedTime().asSeconds();
 
-    // Lógica de salto
-    if (enElAire) {
+    // Movimiento horizontal controlado
+    if (saltando) {
+        // Fase de salto
         velocidadY += gravedad;
         jefeSprite.move(0, velocidadY);
-        if (jefeSprite.getPosition().y >= 550) {
-            jefeSprite.setPosition(jefeSprite.getPosition().x, 550);  // Regresar al suelo
+        if (jefeSprite.getPosition().y >= 520) {
+            jefeSprite.setPosition(jefeSprite.getPosition().x, 520);
             enElAire = false;
-            velocidadY = 0;
+            saltando = false;
+            relojMovimiento.restart();  // Inicia nuevo ciclo
+        }
+    } else if (esperando) {
+        if (tiempoTranscurrido >= 0.5f) {
+            esperando = false;
+            saltando = true;
+            velocidadY = velocidadSalto;
+            sonidoSalto.play();
+            relojMovimiento.restart();
+        }
+    } else {
+        if (tiempoTranscurrido < 2.0f) {
+            // Movimiento horizontal (2 segundos)
+            float velocidad = 500.0f / 2.0f;  // 200 píxeles en 2 segundos
+            float dx = velocidad * relojDelta.restart().asSeconds();
+            if (!moviendoAdelante) dx = -dx;
+
+            float nuevaX = jefeSprite.getPosition().x + dx;
+
+            // Limitar para que no se salga
+            if (nuevaX >= 800 && nuevaX <= 1200 - jefeSprite.getGlobalBounds().width) {
+                jefeSprite.move(dx, 0);
+            }
+        } else {
+            moviendoAdelante = !moviendoAdelante;
+            esperando = true;
+            relojMovimiento.restart();
         }
     }
 }
@@ -63,7 +72,7 @@ void Jefe::mover() {
 void Jefe::saltar() {
     if (!enElAire && relojSalto.getElapsedTime().asSeconds() >= (3 + rand() % 5)) {
         enElAire = true;
-        velocidadY = -100;  // Saltar 100 píxeles hacia arriba
+        velocidadY = -10;  // Saltar 10 píxeles hacia arriba
         sonidoSalto.play();
         relojSalto.restart();
     }

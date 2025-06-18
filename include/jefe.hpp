@@ -20,19 +20,27 @@ private:
     sf::SoundBuffer bufferVictoria;
     sf::Sound sonidoVictoria;
 
-    // Nueva variable para el control del tiempo de aparición del jefe
-    sf::Clock relojAparicion;  
+    // Control del tiempo de aparición
+    sf::Clock relojAparicion;
 
     // Relojes de movimiento y salto
     sf::Clock relojMovimiento;
     sf::Clock relojSalto;
+    sf::Clock relojDelta; // Delta time entre frames
 
-    // Variables de movimiento
+    // Movimiento horizontal
     bool moviendoAdelante = true;
+    float distanciaRecorrida = 0.f;
+    float velocidadMovimiento = 500.f / 3.5f; // 500 píxeles en 3.5 segundos (ida o vuelta)
+
+    // Movimiento vertical (salto)
     bool enElAire = false;
     float velocidadY = 0;
     float gravedad = 0.5f;
     float velocidadSalto = -15.0f;
+
+    bool esperando = false;
+    bool saltando = false;
 
 public:
     Jefe(sf::Vector2f position);

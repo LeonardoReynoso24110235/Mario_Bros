@@ -39,11 +39,18 @@ Escenario::Escenario() {
 
     // Agregar plataformas manuales
     agregarPlataforma(300, 500);
-    agregarPlataforma(400, 500);
-    agregarPlataforma(500, 500);
+    agregarPlataforma(330, 500);
+    agregarPlataforma(360, 500);
+    agregarPlataforma(390, 500);
+    agregarPlataforma(420, 500);
+
     agregarPlataforma(700, 500);
-    agregarPlataforma(800, 500);
-    agregarPlataforma(900, 500);
+    agregarPlataforma(730, 500);
+    agregarPlataforma(760, 500);
+
+    agregarPlataforma(800, 475);
+    agregarPlataforma(830, 445);
+    agregarPlataforma(860, 415);
 }
 
 void Escenario::dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) {
@@ -57,11 +64,10 @@ void Escenario::dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) 
         window.draw(moneda);
     }
 
-    puntajeText.setString("Monedas Acumuladas: " + std::to_string(puntaje));
-    enemigosText.setString("Enemigos Eliminados: " + std::to_string(enemigosMuertos));
+    puntajeText.setString("Monedas Acumuladas: " + std::to_string(puntaje));    
 
     int tiempoRestante = static_cast<int>(tiempoRestanteSegundos);
-    cuentaRegresivaText.setString("Tiempo: " + std::to_string(tiempoRestante));
+    //cuentaRegresivaText.setString("Tiempo: " + std::to_string(tiempoRestante));
 
     window.draw(puntajeText);
     window.draw(enemigosText);

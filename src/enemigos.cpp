@@ -20,10 +20,12 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
     // Establecer textura inicial si se cargó al menos una
     if (!texturasMovimiento.empty()) {
         enemigoSprite.setTexture(texturasMovimiento[0]);
-    }
 
-    // Establecer posición del enemigo: asegúrate de que la coordenada Y esté ajustada por groundLevel
-    enemigoSprite.setPosition(position.x, groundLevel - enemigoSprite.getGlobalBounds().height);
+        // Establecer la posición del enemigo en el nivel del suelo (groundLevel)
+        enemigoSprite.setPosition(position.x, groundLevel);
+    } else {
+        enemigoSprite.setPosition(position.x, groundLevel);  // fallback
+    }
 
     // Cargar sonido de salto enemigo
     if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
@@ -53,7 +55,7 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
         relojAnimacion.restart();
     }
 
-    // Ajustar posición en el suelo: asegura que el enemigo nunca se pase del nivel de suelo
+    // Ajustar posición en el suelo si se cae más allá del límite
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
@@ -62,7 +64,8 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
     enemigoSprite.move(direccion * 0.3f, 0.f);
 
     // Cambiar dirección al llegar a los bordes
-    if (enemigoSprite.getPosition().x <= 0 || enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
+    if (enemigoSprite.getPosition().x <= 0 ||
+        enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
         direccion = -direccion;
     }
 
