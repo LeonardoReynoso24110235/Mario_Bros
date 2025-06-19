@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "personajes.hpp"  // Asegúrate de incluir el encabezado de Personaje
+#include "Personaje.hpp"  
 
 class Escenario {
 private:
@@ -15,27 +15,27 @@ private:
     sf::Font font;
     sf::Text puntajeText;
     sf::Text enemigosText;
-    sf::Text cuentaRegresivaText;  // Cambié el nombre aquí a cuentaRegresivaText
+    sf::Text cuentaRegresivaText;  
 
     int puntaje = 0;
     int enemigosMuertos = 0;
     sf::Clock relojCuentaRegresiva;
-    int duracionInicial = 120; // 2 minutos en segundos
+    int duracionInicial = 120; 
 
 public:
     Escenario();
-    void dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos); 
-    void agregarPlataforma(float x, float y);
-    void generarMoneda(float x, float y);
-    void actualizarMonedas(const sf::FloatRect& boundsPersonaje);
-    void incrementarPuntaje(int cantidad);
-    void incrementarEnemigosMuertos();
-    int getMonedasRecogidas() const { return puntaje; }
-    int getEnemigosMuertos() const { return enemigosMuertos; }
-    int getTiempoRestante();  // tiempo restante en segundos
-    const std::vector<sf::Sprite>& getPlataformas() const;
-    void verificarColisionConPlataformas(Personaje& personaje);  // Declara el método aquí    
-    void actualizar(float deltaTime, Personaje& personaje);
+    void Dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos); 
+    void AgregarPlataforma(float x, float y);
+    void GenerarMoneda(float x, float y);
+    void ActualizarMonedas(const sf::FloatRect& boundsPersonaje);
+    void IncrementarPuntaje(int cantidad);
+    void IncrementarEnemigosMuertos();
+    int GetMonedasRecogidas() const { return puntaje; }
+    int GetEnemigosMuertos() const { return enemigosMuertos; }
+    int GetTiempoRestante();  
+    const std::vector<sf::Sprite>& GetPlataformas() const;
+    void VerificarColisionConPlataformas(Personaje& personaje);  
+    void Actualizar(float deltaTime, Personaje& personaje);
 };
 
 #endif

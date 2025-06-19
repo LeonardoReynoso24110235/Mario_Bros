@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-#include "enemigos.hpp"
+#include "Enemigo.hpp"
 
 class Personaje {
 private:
@@ -37,25 +37,25 @@ public:
     Personaje(sf::Vector2f position);
     Personaje(sf::Vector2f position, sf::Color color);
 
-    void moverIzquierda();
-    void moverDerecha();
-    void saltar();
-    void actualizarGravedad();
-    void actualizarAnimacion();
-    void dibujar(sf::RenderWindow& window);
-    int getVidas() const;
-    void perderVida();
-    void restablecer();
-    sf::FloatRect getBounds() const;
-    bool isJumpingOn(Enemigo& enemy);
-    void detenerMovimiento(); 
-    void perderTodasLasVidas();
-    void dibujarPlataformas(sf::RenderWindow& window);  // Mantener solo esta declaración
-    void setEnPlataforma(bool estado);
-    void setPosicionY(float y);
-    void setVelocidadY(float velocidadY);
-    void asignarMusica(sf::Music* musica1, sf::Music* musica2);
-    void verificarColisionConPlataforma(const sf::FloatRect& plataformaBounds);
+    void MoverIzquierda();
+    void MoverDerecha();
+    void Saltar();
+    void ActualizarGravedad();
+    void ActualizarAnimacion();
+    void Dibujar(sf::RenderWindow& window);
+    int GetVidas() const;
+    void PerderVida();
+    void Restablecer();
+    sf::FloatRect GetBounds() const;
+    bool Saltar(Enemigo& enemy);
+    void DetenerMovimiento(); 
+    void PerderTodasLasVidas();
+    void DibujarPlataformas(sf::RenderWindow& window);  // Mantener solo esta declaración
+    void SetEnPlataforma(bool estado);
+    void SetPosicionY(float y);
+    void SetVelocidadY(float velocidadY);
+    void AsignarMusica(sf::Music* musica1, sf::Music* musica2);
+    void VerificarColisionConPlataforma(const sf::FloatRect& plataformaBounds);
 };
 
-#endif // PERSONAJES_HPP
+#endif 

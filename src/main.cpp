@@ -4,12 +4,12 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include "personajes.hpp"
-#include "enemigos.hpp"
-#include "jefe.hpp"
-#include "escenario.hpp"
-#include "hud.hpp"
-#include "puntaje.hpp"
+#include "Personaje.hpp"
+#include "Enemigo.hpp"
+#include "Jefe.hpp"
+#include "Escenario.hpp"
+#include "Hud.hpp"
+#include "Puntaje.hpp"
 #include <locale>
 #include <clocale>
 
@@ -43,7 +43,7 @@ int main() {
     if (!musicaJefe.openFromFile("assets/img/sound/soundtrack_2.ogg")) return -1;
     musicaJefe.setLoop(true);
 
-    personaje.asignarMusica(&musicaFondo, &musicaJefe);  // Asignar punteros de música al personaje
+    personaje.AsignarMusica(&musicaFondo, &musicaJefe); 
 
     float groundLevel = 600.0f;
     float tiempoParaSiguienteEnemigo = 1 + std::rand() % 5;
@@ -61,11 +61,11 @@ int main() {
         // Generar moneda
         if (relojGenerarMoneda.getElapsedTime().asSeconds() >= 5.0f) {
             float xAleatorio = static_cast<float>(100 + std::rand() % 1000);
-            escenario.generarMoneda(xAleatorio, 0);
+            escenario.GenerarMoneda(xAleatorio, 0);
             relojGenerarMoneda.restart();
         }
 
-        // Generar enemigos si aún no aparece el jefe
+        // Generar enemigos
         if (tiempoTranscurrido < 30) {
             if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= tiempoParaSiguienteEnemigo && enemigos.size() < 10) {
                 enemigos.emplace_back(sf::Vector2f(300 + std::rand() % 700, groundLevel));
@@ -74,7 +74,7 @@ int main() {
             }
         }
 
-        if (tiempoTranscurrido >= 30.0f && personaje.getVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
+        if (tiempoTranscurrido >= 30.0f && personaje.GetVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
             musicaFondo.stop();
             musicaJefe.play();
         }
@@ -83,45 +83,45 @@ int main() {
             jefeAparecido = true;
         }
 
-        // Controles del personaje solo si tiene vidas
-        if (personaje.getVidas() > 0) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.moverIzquierda();
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.moverDerecha();
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.saltar();
+        // Controles del personaje
+        if (personaje.GetVidas() > 0) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.MoverIzquierda();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.MoverDerecha();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.Saltar();
         }
 
-        personaje.actualizarGravedad();
-        escenario.verificarColisionConPlataformas(personaje); 
-        personaje.actualizarAnimacion();
+        personaje.ActualizarGravedad();
+        escenario.VerificarColisionConPlataformas(personaje); 
+        personaje.ActualizarAnimacion();
 
-        escenario.actualizarMonedas(personaje.getBounds());
+        escenario.ActualizarMonedas(personaje.GetBounds());
 
         for (auto& enemigo : enemigos) {
-            enemigo.mover(window, groundLevel);
-            enemigo.interactuarConJugador(personaje);
+            enemigo.Mover(window, groundLevel);
+            enemigo.InteractuarConJugador(personaje);
         }
 
         enemigos.erase(
             std::remove_if(enemigos.begin(), enemigos.end(),
-                           [](const Enemigo& e) { return !e.estaActivo(); }),
+                           [](const Enemigo& e) { return !e.EstaActivo(); }),
             enemigos.end()
         );
 
         if (jefeAparecido) {
-            jefe.mover();
-            jefe.saltar();            
-            jefe.verificarColisionConPersonaje(personaje);            
+            jefe.Mover();
+            jefe.Saltar();            
+            jefe.VerificarColisionConPersonaje(personaje);            
         }
 
-        if (jefeAparecido && jefe.verificarColisionConBandera(personaje)) {
-            jefe.mostrarMensajeFinal(window);
+        if (jefeAparecido && jefe.VerificarColisionConBandera(personaje)) {
+            jefe.MostrarMensajeFinal(window);
             break;
         }
 
-        // GAME OVER si se queda sin vidas o se acaba el tiempo
-        if ((personaje.getVidas() <= 0 || tiempoTranscurrido >= 60)) {
-            if (personaje.getVidas() > 0) {
-                personaje.perderTodasLasVidas();  // Esto detiene la música y muestra sprite de muerte
+        // GAME OVER 
+        if ((personaje.GetVidas() <= 0 || tiempoTranscurrido >= 120)) {
+            if (personaje.GetVidas() > 0) {
+                personaje.PerderTodasLasVidas();  
             }
 
             sf::Font font;
@@ -154,7 +154,7 @@ int main() {
                 }
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
-                    personaje.restablecer();
+                    personaje.Restablecer();
                     enemigos.clear();
                     jefeAparecido = false;
                     relojJuego.restart();
@@ -170,8 +170,8 @@ int main() {
                 }
 
                 window.clear();
-                escenario.dibujar(window, 120 - tiempoTranscurrido);
-                personaje.dibujar(window);
+                escenario.Dibujar(window, 120 - tiempoTranscurrido);
+                personaje.Dibujar(window);
                 window.draw(gameOverText);
                 window.draw(restartText);
                 window.display();
@@ -179,21 +179,21 @@ int main() {
         }
 
         // Actualizar HUD
-        hud.actualizar(personaje.getVidas(), escenario.getMonedasRecogidas(), escenario.getEnemigosMuertos(), 120 - tiempoTranscurrido);
+        hud.Actualizar(personaje.GetVidas(), escenario.GetMonedasRecogidas(), escenario.GetEnemigosMuertos(), 120 - tiempoTranscurrido);
 
-        // Dibujo único por frame
+        // Dibujo
         window.clear();
-        escenario.dibujar(window, 120 - tiempoTranscurrido);
-        if (jefeAparecido) jefe.draw(window);
-        personaje.dibujarPlataformas(window);
-        personaje.dibujar(window);
-        for (auto& enemigo : enemigos) enemigo.dibujar(window);        
-        hud.dibujar(window);
+        escenario.Dibujar(window, 120 - tiempoTranscurrido);
+        if (jefeAparecido) jefe.Draw(window);
+        personaje.DibujarPlataformas(window);
+        personaje.Dibujar(window);
+        for (auto& enemigo : enemigos) enemigo.Dibujar(window);        
+        hud.Dibujar(window);
         window.display();
     }    
 
-    Puntaje::guardarPuntaje(personaje.getVidas() * 3);
-    std::cout << "Puntaje maximo: " << Puntaje::obtenerPuntajeMaximo() << std::endl;
+    Puntaje::GuardarPuntaje(personaje.GetVidas() * 3);
+    std::cout << "Puntaje maximo: " << Puntaje::ObtenerPuntajeMaximo() << std::endl;
 
     return 0;
 }

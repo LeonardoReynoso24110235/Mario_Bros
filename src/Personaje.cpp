@@ -1,6 +1,6 @@
 // personajes.cpp
 
-#include "personajes.hpp"
+#include "Personaje.hpp"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -38,19 +38,19 @@ Personaje::Personaje(sf::Vector2f position) {
     gravedad = 0.5f;
 }
 
-void Personaje::moverIzquierda() {
+void Personaje::MoverIzquierda() {
     if (sprite.getPosition().x > 0)
         sprite.move(-1.5, 0);
     enReposo = false;
 }
 
-void Personaje::moverDerecha() {
+void Personaje::MoverDerecha() {
     if (sprite.getPosition().x < 1200)
         sprite.move(1.5, 0);
     enReposo = false;
 }
 
-void Personaje::saltar() {
+void Personaje::Saltar() {
     if (!saltando) {
         saltando = true;
         velocidadSalto = -10;
@@ -58,7 +58,7 @@ void Personaje::saltar() {
     }
 }
 
-void Personaje::actualizarGravedad() {
+void Personaje::ActualizarGravedad() {
     if (saltando) {
         sprite.move(0, velocidadSalto);
         velocidadSalto += gravedad;
@@ -72,12 +72,12 @@ void Personaje::actualizarGravedad() {
     }
 }
 
-void Personaje::detenerMovimiento() {
+void Personaje::DetenerMovimiento() {
     enReposo = true;
     frameActual = 0;
 }
 
-void Personaje::actualizarAnimacion() {
+void Personaje::ActualizarAnimacion() {
     if (enReposo) {
         sprite.setTexture(*texturasPequeno[0]);
     } else {
@@ -86,15 +86,15 @@ void Personaje::actualizarAnimacion() {
     }
 }
 
-void Personaje::dibujar(sf::RenderWindow& window) {
+void Personaje::Dibujar(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 
-int Personaje::getVidas() const {
+int Personaje::GetVidas() const {
     return vidas;
 }
 
-void Personaje::perderVida() {
+void Personaje::PerderVida() {
     if (vidas > 0) {
         vidas--;
         if (vidas == 0) {
@@ -106,27 +106,27 @@ void Personaje::perderVida() {
     }
 }
 
-bool Personaje::isJumpingOn(Enemigo& enemy) {
-    if (saltando && getBounds().intersects(enemy.getBounds())) {
-        if (sprite.getPosition().y < enemy.getBounds().top) {
+bool Personaje::Saltar(Enemigo& enemy) {
+    if (saltando && GetBounds().intersects(enemy.GetBounds())) {
+        if (sprite.getPosition().y < enemy.GetBounds().top) {
             return true;
         }
     }
     return false;
 }
 
-sf::FloatRect Personaje::getBounds() const {
+sf::FloatRect Personaje::GetBounds() const {
     return sprite.getGlobalBounds();
 }
 
-void Personaje::restablecer() {
+void Personaje::Restablecer() {
     vidas = 3;
     sprite.setPosition(posicionInicial);
     velocidadSalto = 0;
     saltando = false;
 }
 
-void Personaje::perderTodasLasVidas() {
+void Personaje::PerderTodasLasVidas() {
     vidas = 0;
     sprite.setTexture(texturaMuerte);
     if (sonidoMuerte.getStatus() != sf::Sound::Playing) {
@@ -134,7 +134,7 @@ void Personaje::perderTodasLasVidas() {
     }
 }
 
-void Personaje::verificarColisionConPlataforma(const sf::FloatRect& boundsPlataforma) {
+void Personaje::VerificarColisionConPlataforma(const sf::FloatRect& boundsPlataforma) {
     sf::FloatRect personajeBounds = sprite.getGlobalBounds();
 
     if (personajeBounds.intersects(boundsPlataforma) && velocidadSalto >= 0) {
@@ -150,12 +150,12 @@ void Personaje::verificarColisionConPlataforma(const sf::FloatRect& boundsPlataf
     }
 }
 
-void Personaje::asignarMusica(sf::Music* musica1, sf::Music* musica2) {
+void Personaje::AsignarMusica(sf::Music* musica1, sf::Music* musica2) {
     soundtrack1 = musica1;
     soundtrack2 = musica2;
 }
 
-void Personaje::dibujarPlataformas(sf::RenderWindow& window) {
+void Personaje::DibujarPlataformas(sf::RenderWindow& window) {
     for (const auto& plataforma : plataformas) {
         window.draw(plataforma);
     }

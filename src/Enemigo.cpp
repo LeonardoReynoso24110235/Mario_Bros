@@ -1,5 +1,5 @@
-#include "enemigos.hpp"
-#include "personajes.hpp"
+#include "Enemigo.hpp"
+#include "Personaje.hpp"
 #include <iostream>
 
 Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
@@ -20,11 +20,9 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
     // Establecer textura inicial si se cargó al menos una
     if (!texturasMovimiento.empty()) {
         enemigoSprite.setTexture(texturasMovimiento[0]);
-
-        // Establecer la posición del enemigo en el nivel del suelo (groundLevel)
         enemigoSprite.setPosition(position.x, groundLevel);
     } else {
-        enemigoSprite.setPosition(position.x, groundLevel);  // fallback
+        enemigoSprite.setPosition(position.x, groundLevel);
     }
 
     // Cargar sonido de salto enemigo
@@ -34,9 +32,7 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
         sonidoSalto.setBuffer(saltoEnemigoBuffer);
     }
 
-    // Cargar otras texturas (opcional)
     texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png");
-    texturaEnemigo2.loadFromFile("assets/img/img_finales/koopa.png");
 }
 
 Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
@@ -45,7 +41,7 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
 Enemigo::Enemigo(sf::Vector2f position)
     : Enemigo(position, sf::Color::Green) {}
 
-void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
+void Enemigo::Mover(sf::RenderWindow& window, float groundLevel) {
     if (estaEliminado) return;
 
     // Animación
@@ -72,41 +68,41 @@ void Enemigo::mover(sf::RenderWindow& window, float groundLevel) {
     window.draw(enemigoSprite);
 }
 
-void Enemigo::interactuarConJugador(Personaje& personaje) {
+void Enemigo::InteractuarConJugador(Personaje& personaje) {
     if (estaEliminado) return;
 
-    if (enemigoSprite.getGlobalBounds().intersects(personaje.getBounds())) {
+    if (enemigoSprite.getGlobalBounds().intersects(personaje.GetBounds())) {
         std::cout << "Colisión detectada entre personaje y enemigo." << std::endl;
 
-        if (personaje.isJumpingOn(*this)) {
+        if (personaje.Saltar(*this)) {
             std::cout << "Personaje saltó sobre el enemigo." << std::endl;
-            eliminar();
+            Eliminar();
         } else {
-            std::cout << "Personaje tocó el enemigo." << std::endl;
-            personaje.perderVida();
+            std::cout << "Personaje tocó al enemigo." << std::endl;
+            personaje.PerderVida();
         }
     }
 }
 
-void Enemigo::verificarColisionConPersonaje(Personaje& personaje) {
-    interactuarConJugador(personaje);
+void Enemigo::VerificarColisionConPersonaje(Personaje& personaje) {
+    InteractuarConJugador(personaje);
 }
 
-void Enemigo::eliminar() {
+void Enemigo::Eliminar() {
     estaEliminado = true;
     sonidoSalto.play();
 }
 
-void Enemigo::dibujar(sf::RenderWindow& window) {
+void Enemigo::Dibujar(sf::RenderWindow& window) {
     if (!estaEliminado) {
         window.draw(enemigoSprite);
     }
 }
 
-sf::FloatRect Enemigo::getBounds() const {
+sf::FloatRect Enemigo::GetBounds() const {
     return enemigoSprite.getGlobalBounds();
 }
 
-bool Enemigo::estaActivo() const {
+bool Enemigo::EstaActivo() const {
     return !estaEliminado;
 }

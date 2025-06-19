@@ -2,90 +2,100 @@
 
 class Personaje {
     - vidas : int
-    - sprite : Sprite
     - saltando : bool
+    - enPlataforma : bool
     - velocidadSalto : float
+    - gravedad : float
+    - alturaSalto : float
+    - sprite 
+    - plataformas 
 
-    + MoverIzquierda() : void
-    + MoverDerecha() : void
-    + Saltar() : void
-    + ActualizarGravedad() : void
-    + PerderVida() : void
-    + EliminarEnemigo() : void
-    + VerificarColisionConPlataforma() : void
-    + Dibujar() : void
-    + Restablecer() : void
+    + MoverIzquierda()
+    + MoverDerecha()
+    + Saltar()
+    + ActualizarGravedad()
+    + ActualizarAnimacion()
+    + Dibujar()
+    + GetVidas() : int
+    + PerderVida()
+    + Restablecer()
+    + GetBounds() : FloatRect
+    + Saltar(Enemigo&)
+    + DetenerMovimiento()
+    + PerderTodasLasVidas()
+    + DibujarPlataformas()
+    + VerificarColisionConPlataforma()
+    + AsignarMusica()
 }
 
 class Enemigo {
-    - direccion : int
-    - velocidad : float
+    - enemigoSprite 
+    - estaEliminado : bool
 
-    + Caminar() : void
-    + Atacar() : void
-    + RecibirDanio() : void
-    + Eliminar() : void
-    + GetBounds() : FloatRect
+    + Mover()
+    + InteractuarConJugador(Personaje&)
+    + VerificarColisionConPersonaje(Personaje&)
+    + Eliminar()
+    + Dibujar()
+    + GetBounds() : float
+    + EstaActivo() : bool
 }
 
 class Jefe {
-    - tiempoSalto : float    
+    - jefeSprite 
+    - banderaSprite
 
-    + Actualizar() : void    
-    + Saltar() : void
-}
-
-class Moneda {
-    - valor : int
-
-    + Caer() : void
-    + DetectarColision() : void
-}
-
-class Plataforma {
-    - sprite : Sprite
+    + Mover()
+    + Saltar()
+    + VerificarColisionConPersonaje(Personaje&)
+    + VerificarColisionConBandera(Personaje&) : bool
+    + MostrarMensajeFinal()
+    + Draw()
 }
 
 class Escenario {
-    - plataformas : vector
-    - monedas : vector
-    - fondo : Sprite
+    - plataformas(): void 
+    - monedas 
+    - fondoSprite
+    - puntaje : int
+    - enemigosMuertos : int
 
-    + Dibujar() : void
-    + AgregarPlataforma() : void
-    + Actualizar() : void
-    + ActualizarMonedas() : void
-    + VerificarColisiones() : void
-}
-
-class Puntaje {
-    - monedas : int
-    - enemigosEliminados : int
-
-    + Incrementar() : void
-    + Resetear() : void
-    + ObtenerPuntaje() : int
+    + Dibujar()
+    + AgregarPlataforma()
+    + GenerarMoneda()
+    + ActualizarMonedas()
+    + IncrementarPuntaje()
+    + IncrementarEnemigosMuertos()
+    + GetMonedasRecogidas() : int
+    + GetEnemigosMuertos() : int
+    + GetTiempoRestante() : int
+    + VerificarColisionConPlataformas(Personaje&)
+    + Actualizar()
 }
 
 class HUD {
     - textoVidas : Text
-    - textoPuntaje : Text
+    - textoMonedas : Text
+    - textoEnemigos : Text
+    - textoTiempoRestante : Text
 
-    + Dibujar() : void
-    + Actualizar() : void
+    + Actualizar()
+    + Dibujar()
 }
 
-class Main {
-    + main() : int
+class Puntaje {
+    + GuardarPuntaje(int)
+    + ObtenerPuntajeMaximo() : int
 }
 
-Personaje "1" *-- "*" Enemigo
-Personaje "1" o-- "*" Moneda
-Personaje "1" o-- "1" Escenario
-Escenario "1" *-- "6" Plataforma
-Escenario "1" *-- "*" Moneda
-Personaje "1" o-- "1" HUD
 Jefe --|> Enemigo
-Personaje "1" *-- "1" Jefe
+Personaje "1" *-- "*" Enemigo 
+Personaje "1" *-- "1" Jefe 
+Escenario "1" --o "1" Personaje 
+Escenario "1" *-- "*" HUD 
+Escenario "1" o-- "1" Puntaje
+HUD "1" o-- "1" Puntaje
+Enemigo "1" o-- "1" Personaje
+Jefe "1" o-- "1" Personaje
 
 @enduml

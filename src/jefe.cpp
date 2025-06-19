@@ -1,5 +1,5 @@
-#include "jefe.hpp"
-#include "personajes.hpp"
+#include "Jefe.hpp"
+#include "Personaje.hpp"
 #include <iostream>
 
 Jefe::Jefe(sf::Vector2f position) {
@@ -26,7 +26,7 @@ Jefe::Jefe(sf::Vector2f position) {
     sonidoVictoria.setBuffer(bufferVictoria);
 }
 
-void Jefe::mover() {
+void Jefe::Mover() {
     float tiempoTranscurrido = relojMovimiento.getElapsedTime().asSeconds();
 
     // Movimiento horizontal controlado
@@ -69,7 +69,7 @@ void Jefe::mover() {
     }
 }
 
-void Jefe::saltar() {
+void Jefe::Saltar() {
     if (!enElAire && relojSalto.getElapsedTime().asSeconds() >= (3 + rand() % 5)) {
         enElAire = true;
         velocidadY = -10;  // Saltar 10 píxeles hacia arriba
@@ -78,24 +78,24 @@ void Jefe::saltar() {
     }
 }
 
-void Jefe::verificarColisionConPersonaje(Personaje& personaje) {
+void Jefe::VerificarColisionConPersonaje(Personaje& personaje) {
     if (relojAparicion.getElapsedTime().asSeconds() < 1.0f) return;
-    if (jefeSprite.getGlobalBounds().intersects(personaje.getBounds())) {
-        personaje.perderVida();
+    if (jefeSprite.getGlobalBounds().intersects(personaje.GetBounds())) {
+        personaje.PerderVida();
     }
 }
 
-bool Jefe::verificarColisionConBandera(Personaje& personaje) {
-    return banderaSprite.getGlobalBounds().intersects(personaje.getBounds());
+bool Jefe::VerificarColisionConBandera(Personaje& personaje) {
+    return banderaSprite.getGlobalBounds().intersects(personaje.GetBounds());
 }
 
-void Jefe::mostrarMensajeFinal(sf::RenderWindow& window) {
+void Jefe::MostrarMensajeFinal(sf::RenderWindow& window) {
     sonidoVictoria.play();
 
     sf::Font font;
     if (!font.loadFromFile("assets/img/text/letraPixel.ttf")) return;
 
-    sf::Text texto("¡Felicidades! Has ganado\nPresiona ENTER para continuar", font, 28);
+    sf::Text texto("Felicidades\n\n Has ganado\n\n\nPresiona ENTER para continuar", font, 28);
     texto.setFillColor(sf::Color::White);
     texto.setStyle(sf::Text::Bold);
     texto.setPosition(window.getSize().x / 2 - texto.getGlobalBounds().width / 2,
@@ -116,7 +116,7 @@ void Jefe::mostrarMensajeFinal(sf::RenderWindow& window) {
     }
 }
 
-void Jefe::draw(sf::RenderWindow& window) {
+void Jefe::Draw(sf::RenderWindow& window) {
     window.draw(jefeSprite);
     window.draw(banderaSprite);
 }

@@ -1,7 +1,7 @@
 // puntaje.cpp
-#include "puntaje.hpp"
+#include "Puntaje.hpp"
 
-void Puntaje::guardarPuntaje(int puntaje) {
+void Puntaje::GuardarPuntaje(int puntaje) {
     std::ofstream archivo("puntajes.txt", std::ios::app);
     if (archivo.is_open()) {
         archivo << puntaje << std::endl;
@@ -9,7 +9,7 @@ void Puntaje::guardarPuntaje(int puntaje) {
     }
 }
 
-int Puntaje::obtenerPuntajeMaximo() {
+int Puntaje::ObtenerPuntajeMaximo() {
     int maxPuntaje = 0;
     std::ifstream archivo("puntajes.txt");
     int puntaje;

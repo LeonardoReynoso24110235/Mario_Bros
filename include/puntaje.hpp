@@ -1,4 +1,3 @@
-// puntaje.h
 #ifndef PUNTAJE_HPP
 #define PUNTAJE_HPP
 
@@ -7,8 +6,8 @@
 
 class Puntaje {
 public:
-    static void guardarPuntaje(int puntaje);
-    static int obtenerPuntajeMaximo();
+    static void GuardarPuntaje(int puntaje);
+    static int ObtenerPuntajeMaximo();
 };
 
-#endif // PUNTAJE_H
+#endif 

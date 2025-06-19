@@ -1,4 +1,4 @@
-#include "hud.hpp"
+#include "Hud.hpp"
 #include <iostream>
 
 using namespace std;
@@ -26,30 +26,23 @@ HUD::HUD() {
     textoMonedas.setFillColor(sf::Color::White);
     textoMonedas.setPosition(marginLeft, marginTop + spacing);
 
-    // Enemigos
-    textoEnemigos.setFont(font);
-    textoEnemigos.setCharacterSize(fontSize);
-    textoEnemigos.setFillColor(sf::Color::Red);
-    textoEnemigos.setPosition(marginLeft, marginTop + 2 * spacing);
-
     // Tiempo restante
     textoTiempoRestante.setFont(font);
     textoTiempoRestante.setCharacterSize(fontSize);
-    textoTiempoRestante.setFillColor(sf::Color::Yellow);
+    textoTiempoRestante.setFillColor(sf::Color::White);
     textoTiempoRestante.setPosition(marginLeft, marginTop + 3 * spacing);
 }
 
-void HUD::actualizar(int vidas, int monedas, int enemigosMuertos, float tiempoRestante) {
+void HUD::Actualizar(int vidas, int monedas, int enemigosMuertos, float tiempoRestante) {
     //textoVidas.setString("Vidas: " + std::to_string(vidas));
-    //textoMonedas.setString("Monedas: " + std::to_string(monedas));
-    //textoEnemigos.setString("Enemigos: " + std::to_string(enemigosMuertos));
+    //textoMonedas.setString("Monedas: " + std::to_string(monedas));    
 
     int minutos = static_cast<int>(tiempoRestante) / 60;
     int segundos = static_cast<int>(tiempoRestante) % 60;
     textoTiempoRestante.setString("Tiempo restante: " + std::to_string(minutos) + ":" + (segundos < 10 ? "0" : "") + std::to_string(segundos));
 }
 
-void HUD::dibujar(sf::RenderWindow& window) {
+void HUD::Dibujar(sf::RenderWindow& window) {
     window.draw(textoVidas);
     window.draw(textoMonedas);
     window.draw(textoEnemigos);

@@ -1,6 +1,4 @@
-// escenario.cpp
-
-#include "escenario.hpp"
+#include "Escenario.hpp"
 #include <iostream>
 
 Escenario::Escenario() {
@@ -20,40 +18,33 @@ Escenario::Escenario() {
     if (!font.loadFromFile("assets/img/text/letraPixel.ttf")) {
         std::cerr << "Error cargando letraPixel.ttf\n";
     }
-
-    // Configuración de textos
+    
     puntajeText.setFont(font);
     puntajeText.setCharacterSize(20);
     puntajeText.setFillColor(sf::Color::Yellow);
-    puntajeText.setPosition(10, 10);
-
-    enemigosText.setFont(font);
-    enemigosText.setCharacterSize(20);
-    enemigosText.setFillColor(sf::Color::Red);
-    enemigosText.setPosition(10, 40);
+    puntajeText.setPosition(10, 10);    
 
     cuentaRegresivaText.setFont(font);
     cuentaRegresivaText.setCharacterSize(20);
     cuentaRegresivaText.setFillColor(sf::Color::White);
     cuentaRegresivaText.setPosition(1000, 10);
 
-    // Agregar plataformas manuales
-    agregarPlataforma(300, 500);
-    agregarPlataforma(330, 500);
-    agregarPlataforma(360, 500);
-    agregarPlataforma(390, 500);
-    agregarPlataforma(420, 500);
+    AgregarPlataforma(300, 500);
+    AgregarPlataforma(330, 500);
+    AgregarPlataforma(360, 500);
+    AgregarPlataforma(390, 500);
+    AgregarPlataforma(420, 500);
 
-    agregarPlataforma(700, 500);
-    agregarPlataforma(730, 500);
-    agregarPlataforma(760, 500);
+    AgregarPlataforma(700, 500);
+    AgregarPlataforma(730, 500);
+    AgregarPlataforma(760, 500);
 
-    agregarPlataforma(800, 475);
-    agregarPlataforma(830, 445);
-    agregarPlataforma(860, 415);
+    AgregarPlataforma(800, 475);
+    AgregarPlataforma(830, 445);
+    AgregarPlataforma(860, 415);
 }
 
-void Escenario::dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) {
+void Escenario::Dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) {
     window.draw(fondoSprite);
 
     for (const auto& plataforma : plataformas) {
@@ -74,58 +65,52 @@ void Escenario::dibujar(sf::RenderWindow& window, float tiempoRestanteSegundos) 
     window.draw(cuentaRegresivaText);
 }
 
-void Escenario::agregarPlataforma(float x, float y) {
+void Escenario::AgregarPlataforma(float x, float y) {
     sf::Sprite bloque;
     bloque.setTexture(bloqueTexture);
     bloque.setPosition(x, y);
     plataformas.push_back(bloque);
 }
 
-void Escenario::generarMoneda(float x, float y) {
+void Escenario::GenerarMoneda(float x, float y) {
     sf::Sprite moneda;
     moneda.setTexture(monedaTexture);
     moneda.setPosition(x, y);
     monedas.push_back(moneda);
 }
 
-void Escenario::actualizarMonedas(const sf::FloatRect& boundsPersonaje) {
-    for (auto& moneda : monedas) {
-        // Simula gravedad
+void Escenario::ActualizarMonedas(const sf::FloatRect& boundsPersonaje) {
+    for (auto& moneda : monedas) {        
         if (moneda.getPosition().y < 550) {
             moneda.move(0, 1); 
         }
-
-        // Recolecta la moneda
+        
         if (moneda.getGlobalBounds().intersects(boundsPersonaje)) {
-            incrementarPuntaje(1);
+            IncrementarPuntaje(1);
             moneda.setPosition(-100, -100);  // Oculta la moneda
         }
     }
 }
 
-void Escenario::incrementarPuntaje(int cantidad) {
+void Escenario::IncrementarPuntaje(int cantidad) {
     puntaje += cantidad;
 }
 
-void Escenario::incrementarEnemigosMuertos() {
-    enemigosMuertos++;
-}
-
-int Escenario::getTiempoRestante() {
+int Escenario::GetTiempoRestante() {
     return duracionInicial - relojCuentaRegresiva.getElapsedTime().asSeconds();
 }
 
-const std::vector<sf::Sprite>& Escenario::getPlataformas() const {
+const std::vector<sf::Sprite>& Escenario::GetPlataformas() const {
     return plataformas;
 }
 
-void Escenario::verificarColisionConPlataformas(Personaje& personaje) {
+void Escenario::VerificarColisionConPlataformas(Personaje& personaje) {
     for (const auto& plataforma : plataformas) {
-        personaje.verificarColisionConPlataforma(plataforma.getGlobalBounds());
+        personaje.VerificarColisionConPlataforma(plataforma.getGlobalBounds());
     }
 }
 
-void Escenario::actualizar(float deltaTime, Personaje& personaje) {
-    actualizarMonedas(personaje.getBounds());
-    verificarColisionConPlataformas(personaje);
+void Escenario::Actualizar(float deltaTime, Personaje& personaje) {
+    ActualizarMonedas(personaje.GetBounds());
+    VerificarColisionConPlataformas(personaje);
 }

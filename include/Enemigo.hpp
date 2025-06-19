@@ -5,7 +5,7 @@
 #include <SFML/Audio.hpp>
 #include <vector>
 
-class Personaje;  // Declaración adelantada
+class Personaje;
 
 class Enemigo {
 private:
@@ -16,27 +16,24 @@ private:
     sf::SoundBuffer saltoEnemigoBuffer;
     sf::Sound sonidoSalto;
 
-    int direccion = -1; // -1: izquierda, 1: derecha
+    int direccion = -1; 
     int frameActual = 0;
     bool estaEliminado = false;
     sf::Clock relojAnimacion;
 
-public:
-    // Constructores
+public:    
     Enemigo(sf::Vector2f position, sf::Color color, float groundLevel);
     Enemigo(sf::Vector2f position, sf::Color color);
     Enemigo(sf::Vector2f position);
-
-    // Comportamiento
-    void mover(sf::RenderWindow& window, float groundLevel);
-    void interactuarConJugador(Personaje& personaje);
-    void verificarColisionConPersonaje(Personaje& personaje);
-    void eliminar();
-    void dibujar(sf::RenderWindow& window);
-
-    // Accesores
-    sf::FloatRect getBounds() const;
-    bool estaActivo() const;
+    
+    void Mover(sf::RenderWindow& window, float groundLevel);
+    void InteractuarConJugador(Personaje& personaje);
+    void VerificarColisionConPersonaje(Personaje& personaje);
+    void Eliminar();
+    void Dibujar(sf::RenderWindow& window);
+    
+    sf::FloatRect GetBounds() const;
+    bool EstaActivo() const;
 };
 
-#endif // ENEMIGOS_H
+#endif 
