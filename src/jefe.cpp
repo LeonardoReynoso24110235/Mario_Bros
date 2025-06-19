@@ -9,11 +9,11 @@ Jefe::Jefe(sf::Vector2f position) {
     jefeSprite.setTexture(jefeTexture);
     jefeSprite.setPosition(position);
 
-    if (!banderaTexture.loadFromFile("assets/img/img_finales/bandera_4.png")) {
+    if (!banderaTexture.loadFromFile("assets/img/img_finales/Bandera2.png")) {
         std::cerr << "Error al cargar bandera.png\n";
     }
     banderaSprite.setTexture(banderaTexture);
-    banderaSprite.setPosition(1000, 450);    
+    banderaSprite.setPosition(1000, 525);    
 
     relojAparicion.restart();
 
@@ -28,17 +28,15 @@ Jefe::Jefe(sf::Vector2f position) {
 
 void Jefe::Mover() {
     float tiempoTranscurrido = relojMovimiento.getElapsedTime().asSeconds();
-
-    // Movimiento horizontal controlado
+    
     if (saltando) {
-        // Fase de salto
         velocidadY += gravedad;
         jefeSprite.move(0, velocidadY);
         if (jefeSprite.getPosition().y >= 520) {
             jefeSprite.setPosition(jefeSprite.getPosition().x, 520);
             enElAire = false;
             saltando = false;
-            relojMovimiento.restart();  // Inicia nuevo ciclo
+            relojMovimiento.restart();  
         }
     } else if (esperando) {
         if (tiempoTranscurrido >= 0.5f) {
@@ -49,15 +47,13 @@ void Jefe::Mover() {
             relojMovimiento.restart();
         }
     } else {
-        if (tiempoTranscurrido < 2.0f) {
-            // Movimiento horizontal (2 segundos)
-            float velocidad = 500.0f / 2.0f;  // 200 píxeles en 2 segundos
+        if (tiempoTranscurrido < 2.0f) {            
+            float velocidad = 500.0f / 1.5f; 
             float dx = velocidad * relojDelta.restart().asSeconds();
             if (!moviendoAdelante) dx = -dx;
 
             float nuevaX = jefeSprite.getPosition().x + dx;
-
-            // Limitar para que no se salga
+            
             if (nuevaX >= 800 && nuevaX <= 1200 - jefeSprite.getGlobalBounds().width) {
                 jefeSprite.move(dx, 0);
             }
@@ -72,7 +68,7 @@ void Jefe::Mover() {
 void Jefe::Saltar() {
     if (!enElAire && relojSalto.getElapsedTime().asSeconds() >= (3 + rand() % 5)) {
         enElAire = true;
-        velocidadY = -10;  // Saltar 10 píxeles hacia arriba
+        velocidadY = -10;  
         sonidoSalto.play();
         relojSalto.restart();
     }
