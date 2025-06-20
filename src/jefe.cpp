@@ -76,13 +76,13 @@ void Jefe::Saltar() {
 
 void Jefe::VerificarColisionConPersonaje(Personaje& personaje) {
     if (relojAparicion.getElapsedTime().asSeconds() < 1.0f) return;
-    if (jefeSprite.getGlobalBounds().intersects(personaje.GetBounds())) {
+    if (jefeSprite.getGlobalBounds().intersects(personaje.ObtenerLimites())) {
         personaje.PerderVida();
     }
 }
 
 bool Jefe::VerificarColisionConBandera(Personaje& personaje) {
-    return banderaSprite.getGlobalBounds().intersects(personaje.GetBounds());
+    return banderaSprite.getGlobalBounds().intersects(personaje.ObtenerLimites());
 }
 
 void Jefe::MostrarMensajeFinal(sf::RenderWindow& window) {
@@ -112,7 +112,7 @@ void Jefe::MostrarMensajeFinal(sf::RenderWindow& window) {
     }
 }
 
-void Jefe::Draw(sf::RenderWindow& window) {
+void Jefe::Dibujar(sf::RenderWindow& window) {
     window.draw(jefeSprite);
     window.draw(banderaSprite);
 }

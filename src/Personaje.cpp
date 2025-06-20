@@ -90,7 +90,7 @@ void Personaje::Dibujar(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 
-int Personaje::GetVidas() const {
+int Personaje::ObtenerVidas() const {
     return vidas;
 }
 
@@ -107,15 +107,15 @@ void Personaje::PerderVida() {
 }
 
 bool Personaje::Saltar(Enemigo& enemy) {
-    if (saltando && GetBounds().intersects(enemy.GetBounds())) {
-        if (sprite.getPosition().y < enemy.GetBounds().top) {
+    if (saltando && ObtenerLimites().intersects(enemy.ObtenerLimites())) {
+        if (sprite.getPosition().y < enemy.ObtenerLimites().top) {
             return true;
         }
     }
     return false;
 }
 
-sf::FloatRect Personaje::GetBounds() const {
+sf::FloatRect Personaje::ObtenerLimites() const {
     return sprite.getGlobalBounds();
 }
 

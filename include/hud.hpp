@@ -6,7 +6,7 @@
 class HUD {
 public:
     HUD();
-    void Actualizar(int vidas, int monedas, int enemigosMuertos, float tiempoRestante);  // Cambié la declaración aquí
+    void Actualizar(int vidas, int monedas, float tiempoRestante);  
     void Dibujar(sf::RenderWindow& window);
 
 private:

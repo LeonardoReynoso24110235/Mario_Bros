@@ -32,8 +32,8 @@ public:
     void Eliminar();
     void Dibujar(sf::RenderWindow& window);
     
-    sf::FloatRect GetBounds() const;
-    bool EstaActivo() const;
+    sf::FloatRect ObtenerLimites() const;
+    bool ObtenerEstaActivo() const;
 };
 
 #endif 

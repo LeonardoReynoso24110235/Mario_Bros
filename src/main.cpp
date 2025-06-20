@@ -13,14 +13,11 @@
 #include <locale>
 #include <clocale>
 
-
-
 int main() {
     std::setlocale(LC_ALL, "es_ES.UTF-8");
     sf::RenderWindow window(sf::VideoMode(1200, 675), "Cetianos Bros");
 
     HUD hud;
-
     Escenario escenario;
     Personaje personaje(sf::Vector2f(100, 550));
     std::srand(static_cast<unsigned>(std::time(nullptr)));
@@ -33,7 +30,6 @@ int main() {
     std::vector<Enemigo> enemigos;
     Jefe jefe(sf::Vector2f(800, 550));
 
-    // Música
     sf::Music musicaFondo;
     if (!musicaFondo.openFromFile("assets/img/sound/soundtrack.ogg")) return -1;
     musicaFondo.setLoop(true);
@@ -58,14 +54,12 @@ int main() {
 
         tiempoTranscurrido = relojJuego.getElapsedTime().asSeconds();
 
-        // Generar moneda
         if (relojGenerarMoneda.getElapsedTime().asSeconds() >= 5.0f) {
             float xAleatorio = static_cast<float>(100 + std::rand() % 1000);
             escenario.GenerarMoneda(xAleatorio, 0);
             relojGenerarMoneda.restart();
         }
 
-        // Generar enemigos
         if (tiempoTranscurrido < 30) {
             if (relojGenerarEnemigo.getElapsedTime().asSeconds() >= tiempoParaSiguienteEnemigo && enemigos.size() < 10) {
                 enemigos.emplace_back(sf::Vector2f(300 + std::rand() % 700, groundLevel));
@@ -74,7 +68,7 @@ int main() {
             }
         }
 
-        if (tiempoTranscurrido >= 30.0f && personaje.GetVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
+        if (tiempoTranscurrido >= 30.0f && personaje.ObtenerVidas() > 0 && musicaFondo.getStatus() == sf::Music::Playing) {
             musicaFondo.stop();
             musicaJefe.play();
         }
@@ -83,8 +77,7 @@ int main() {
             jefeAparecido = true;
         }
 
-        // Controles del personaje
-        if (personaje.GetVidas() > 0) {
+        if (personaje.ObtenerVidas() > 0) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) personaje.MoverIzquierda();
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) personaje.MoverDerecha();
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) personaje.Saltar();
@@ -94,7 +87,7 @@ int main() {
         escenario.VerificarColisionConPlataformas(personaje); 
         personaje.ActualizarAnimacion();
 
-        escenario.ActualizarMonedas(personaje.GetBounds());
+        escenario.ActualizarMonedas(personaje.ObtenerLimites()); // <- Cambiado
 
         for (auto& enemigo : enemigos) {
             enemigo.Mover(window, groundLevel);
@@ -103,7 +96,7 @@ int main() {
 
         enemigos.erase(
             std::remove_if(enemigos.begin(), enemigos.end(),
-                           [](const Enemigo& e) { return !e.EstaActivo(); }),
+                           [](const Enemigo& e) { return !e.ObtenerEstaActivo(); }), // <- Cambiado
             enemigos.end()
         );
 
@@ -118,9 +111,8 @@ int main() {
             break;
         }
 
-        // GAME OVER 
-        if ((personaje.GetVidas() <= 0 || tiempoTranscurrido >= 120)) {
-            if (personaje.GetVidas() > 0) {
+        if ((personaje.ObtenerVidas() <= 0 || tiempoTranscurrido >= 120)) {
+            if (personaje.ObtenerVidas() > 0) {
                 personaje.PerderTodasLasVidas();  
             }
 
@@ -178,13 +170,11 @@ int main() {
             }
         }
 
-        // Actualizar HUD
-        hud.Actualizar(personaje.GetVidas(), escenario.GetMonedasRecogidas(), escenario.GetEnemigosMuertos(), 120 - tiempoTranscurrido);
+       hud.Actualizar(personaje.ObtenerVidas(), escenario.ObtenerMonedasRecogidas(), 120 - tiempoTranscurrido);
 
-        // Dibujo
         window.clear();
         escenario.Dibujar(window, 120 - tiempoTranscurrido);
-        if (jefeAparecido) jefe.Draw(window);
+        if (jefeAparecido) jefe.Dibujar(window);
         personaje.DibujarPlataformas(window);
         personaje.Dibujar(window);
         for (auto& enemigo : enemigos) enemigo.Dibujar(window);        
@@ -192,7 +182,7 @@ int main() {
         window.display();
     }    
 
-    Puntaje::GuardarPuntaje(personaje.GetVidas() * 3);
+    Puntaje::GuardarPuntaje(personaje.ObtenerVidas() * 3);
     std::cout << "Puntaje maximo: " << Puntaje::ObtenerPuntajeMaximo() << std::endl;
 
     return 0;

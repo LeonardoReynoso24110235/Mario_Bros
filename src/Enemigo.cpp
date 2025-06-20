@@ -7,7 +7,6 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
     estaEliminado = false;
     frameActual = 0;
 
-    // Cargar texturas para animación
     for (int i = 1; i <= 2; ++i) {
         sf::Texture textura;
         if (!textura.loadFromFile("assets/img/img_finales/goomba" + std::to_string(i) + ".png")) {
@@ -16,23 +15,22 @@ Enemigo::Enemigo(sf::Vector2f position, sf::Color color, float groundLevel) {
         }
         texturasMovimiento.push_back(textura);
     }
-
-    // Establecer textura inicial si se cargó al menos una
+   
     if (!texturasMovimiento.empty()) {
         enemigoSprite.setTexture(texturasMovimiento[0]);
+       
         enemigoSprite.setPosition(position.x, groundLevel);
     } else {
         enemigoSprite.setPosition(position.x, groundLevel);
     }
-
-    // Cargar sonido de salto enemigo
+   
     if (!saltoEnemigoBuffer.loadFromFile("assets/img/sound/salto.mp3")) {
         std::cerr << "Error al cargar sonido de salto enemigo.\n";
     } else {
         sonidoSalto.setBuffer(saltoEnemigoBuffer);
     }
-
-    texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png");
+    
+    texturaEnemigo1.loadFromFile("assets/img/img_finales/goomba1.png");    
 }
 
 Enemigo::Enemigo(sf::Vector2f position, sf::Color color)
@@ -44,22 +42,18 @@ Enemigo::Enemigo(sf::Vector2f position)
 void Enemigo::Mover(sf::RenderWindow& window, float groundLevel) {
     if (estaEliminado) return;
 
-    // Animación
     if (relojAnimacion.getElapsedTime().asSeconds() > 0.2f && !texturasMovimiento.empty()) {
         frameActual = (frameActual + 1) % texturasMovimiento.size();
         enemigoSprite.setTexture(texturasMovimiento[frameActual]);
         relojAnimacion.restart();
     }
 
-    // Ajustar posición en el suelo si se cae más allá del límite
     if (enemigoSprite.getPosition().y + enemigoSprite.getGlobalBounds().height > groundLevel) {
         enemigoSprite.setPosition(enemigoSprite.getPosition().x, groundLevel - enemigoSprite.getGlobalBounds().height);
     }
 
-    // Movimiento lateral
     enemigoSprite.move(direccion * 0.3f, 0.f);
 
-    // Cambiar dirección al llegar a los bordes
     if (enemigoSprite.getPosition().x <= 0 ||
         enemigoSprite.getPosition().x + enemigoSprite.getGlobalBounds().width >= window.getSize().x) {
         direccion = -direccion;
@@ -71,7 +65,7 @@ void Enemigo::Mover(sf::RenderWindow& window, float groundLevel) {
 void Enemigo::InteractuarConJugador(Personaje& personaje) {
     if (estaEliminado) return;
 
-    if (enemigoSprite.getGlobalBounds().intersects(personaje.GetBounds())) {
+    if (enemigoSprite.getGlobalBounds().intersects(personaje.ObtenerLimites())) {
         std::cout << "Colisión detectada entre personaje y enemigo." << std::endl;
 
         if (personaje.Saltar(*this)) {
@@ -99,10 +93,10 @@ void Enemigo::Dibujar(sf::RenderWindow& window) {
     }
 }
 
-sf::FloatRect Enemigo::GetBounds() const {
+sf::FloatRect Enemigo::ObtenerLimites() const {
     return enemigoSprite.getGlobalBounds();
 }
 
-bool Enemigo::EstaActivo() const {
+bool Enemigo::ObtenerEstaActivo() const {
     return !estaEliminado;
 }

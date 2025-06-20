@@ -1,12 +1,12 @@
-# Mario_Bros
+# Mario Bros
 
 ### Integrantes:
-- Jeremy Gael Vázquez Jiménez  
-- Leonardo Reynoso Arana
+- Jeremy Gael Vázquez Jiménez   24110234  3E
+- Leonardo Reynoso Arana        24110235  3E
 
 ---
 
-# Cetianos Bros - Videojuego
+# Mario Bros - Videojuego
 
 ## Descripción del Proyecto
 
@@ -24,7 +24,7 @@ El juego se desarrolla en un escenario con plataformas compuestas por bloques pe
 - Sobrevivir hasta enfrentarte al jefe final y alcanzar la bandera para ganar.
 
 ### Controles:
-| Tecla              | Acción                    |
+| Tecla              | Accion                    |
 |--------------------|---------------------------|
 | Flecha izquierda   | Mover a la izquierda      |
 | Flecha derecha     | Mover a la derecha        |
@@ -43,29 +43,37 @@ El juego se desarrolla en un escenario con plataformas compuestas por bloques pe
 ## Características Principales
 
 - Movimiento lateral y salto del personaje.
+![Captura de juego](img/jugar.png)
 - Plataformas con colisión que el personaje puede pisar.
+![alt text](img/plataforma.png)
 - Enemigos que aparecen aleatoriamente cada 1 a 5 segundos y pueden ser eliminados si el personaje les cae encima.
+![alt text](img/enemigos.png)
 - Monedas que aparecen cada 5 segundos y se recogen al tocarlas.
+![alt text](img/moneda.png)
 - Jefe que aparece a los 30 segundos de juego y realiza saltos y ataques.
-- Si el personaje es alcanzado por el jefe, pierde vidas.
+![alt text](img/jefe.png)
+- Si el personaje es alcanzado por el jefe, pierde.
+![alt text](img/pierde.png)
 - Cuando las vidas llegan a 0 o se acaba el tiempo, se muestra la pantalla de "GAME OVER".
-- Sistema HUD que muestra:
-  - Vidas restantes
-  - Monedas recolectadas
-  - Enemigos eliminados
+![alt text](img/pierde.png)
+- Sistema HUD que muestra:  
+  - Monedas recolectadas  
   - Tiempo restante
+![alt text](img/tablero.png)  
 
 ---
 
 ## Condiciones de Fin del Juego
 
 **Game Over:**
-- El personaje pierde todas sus vidas.
-- Se alcanza el tiempo límite (60 segundos).
+- El personaje es tocado por un enemigo o jefe.
+- Se alcanza el tiempo límite (120 segundos).
+![alt text](img/pierde.png)
 
 **Victoria:**
 - El jugador derrota al jefe final y alcanza la bandera.
 - Se muestra un mensaje de victoria y termina el juego.
+![alt text](img/gane.png)
 
 ---
 
@@ -98,8 +106,11 @@ El juego se desarrolla en un escenario con plataformas compuestas por bloques pe
 ## Recursos
 
 - Texturas del personaje, enemigos, plataformas y monedas: `assets/img/img_finales/`
+![alt text](img/imagenes.png)
 - Música y sonidos: `assets/img/sound/`
+![alt text](img/sonido.png)
 - Fuente de texto pixelada: `letraPixel.ttf`
+![alt text](img/text.png)
 
 ---
 
@@ -124,4 +135,4 @@ El juego se desarrolla en un escenario con plataformas compuestas por bloques pe
 Asegúrate de tener SFML correctamente instalada y ejecuta:
 
 ```bash
-make run
+make run 

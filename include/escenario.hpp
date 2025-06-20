@@ -28,12 +28,11 @@ public:
     void AgregarPlataforma(float x, float y);
     void GenerarMoneda(float x, float y);
     void ActualizarMonedas(const sf::FloatRect& boundsPersonaje);
-    void IncrementarPuntaje(int cantidad);
-    void IncrementarEnemigosMuertos();
-    int GetMonedasRecogidas() const { return puntaje; }
-    int GetEnemigosMuertos() const { return enemigosMuertos; }
-    int GetTiempoRestante();  
-    const std::vector<sf::Sprite>& GetPlataformas() const;
+    void IncrementarPuntaje(int cantidad);    
+    int ObtenerMonedasRecogidas() const { return puntaje; }
+    int ObtenerEnemigosMuertos() const { return enemigosMuertos; }
+    int ObtenerTiempoRestante();  
+    const std::vector<sf::Sprite>& ObtenerPlataformas() const;
     void VerificarColisionConPlataformas(Personaje& personaje);  
     void Actualizar(float deltaTime, Personaje& personaje);
 };

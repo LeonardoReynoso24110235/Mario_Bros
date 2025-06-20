@@ -46,7 +46,7 @@ public:
     void VerificarColisionConPersonaje(Personaje& personaje);
     bool VerificarColisionConBandera(Personaje& personaje);
     void MostrarMensajeFinal(sf::RenderWindow& window);
-    void Draw(sf::RenderWindow& window);
+    void Dibujar(sf::RenderWindow& window);
 };
 
 #endif

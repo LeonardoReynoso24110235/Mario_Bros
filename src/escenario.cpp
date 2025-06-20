@@ -96,11 +96,11 @@ void Escenario::IncrementarPuntaje(int cantidad) {
     puntaje += cantidad;
 }
 
-int Escenario::GetTiempoRestante() {
+int Escenario::ObtenerTiempoRestante() {
     return duracionInicial - relojCuentaRegresiva.getElapsedTime().asSeconds();
 }
 
-const std::vector<sf::Sprite>& Escenario::GetPlataformas() const {
+const std::vector<sf::Sprite>& Escenario::ObtenerPlataformas() const {
     return plataformas;
 }
 
@@ -111,6 +111,6 @@ void Escenario::VerificarColisionConPlataformas(Personaje& personaje) {
 }
 
 void Escenario::Actualizar(float deltaTime, Personaje& personaje) {
-    ActualizarMonedas(personaje.GetBounds());
+    ActualizarMonedas(personaje.ObtenerLimites());
     VerificarColisionConPlataformas(personaje);
 }

@@ -1,4 +1,3 @@
-// puntaje.cpp
 #include "Puntaje.hpp"
 
 void Puntaje::GuardarPuntaje(int puntaje) {

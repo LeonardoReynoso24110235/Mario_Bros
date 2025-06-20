@@ -43,17 +43,17 @@ public:
     void ActualizarGravedad();
     void ActualizarAnimacion();
     void Dibujar(sf::RenderWindow& window);
-    int GetVidas() const;
+    int ObtenerVidas() const;
     void PerderVida();
     void Restablecer();
-    sf::FloatRect GetBounds() const;
+    sf::FloatRect ObtenerLimites() const;
     bool Saltar(Enemigo& enemy);
     void DetenerMovimiento(); 
     void PerderTodasLasVidas();
     void DibujarPlataformas(sf::RenderWindow& window);  // Mantener solo esta declaración
-    void SetEnPlataforma(bool estado);
-    void SetPosicionY(float y);
-    void SetVelocidadY(float velocidadY);
+    void SaberEnPlataforma(bool estado);
+    void SaberPosicionY(float y);
+    void SaberVelocidadY(float velocidadY);
     void AsignarMusica(sf::Music* musica1, sf::Music* musica2);
     void VerificarColisionConPlataforma(const sf::FloatRect& plataformaBounds);
 };
